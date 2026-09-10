@@ -198,6 +198,9 @@ queue the group	Gruppe einreihen
 {} tools queued	{} Werkzeuge eingereiht
 Purple team	Purple Team
 detection, forensics and hardening · from any repository	Erkennung, Forensik und Härtung · aus jeder Quelle
-by popularity · A queues the whole group	nach Beliebtheit · A reiht die ganze Gruppe ein
+by popularity · A queues the whole group · Esc back	nach Beliebtheit · A reiht die ganze Gruppe ein · Esc zurück
  ☠ Darkside · {} · {} tools 	 ☠ Darkside · {} · {} Werkzeuge 
-Darkside: with the BlackArch repository enabled, its tools by group as Store shelves · A queues a whole group	Darkside: mit aktivierter BlackArch-Quelle erscheinen ihre Werkzeuge nach Gruppe als Store-Regale · A reiht eine ganze Gruppe ein
+Darkside: with the BlackArch repository enabled, a ☠ shelf in the Store lists its tools by group · Enter opens a group, A queues it	Darkside: mit aktivierter BlackArch-Quelle listet ein ☠-Regal im Store ihre Werkzeuge nach Gruppe · Enter öffnet eine Gruppe, A reiht sie ein
+ ☠ Darkside · {} groups 	 ☠ Darkside · {} Gruppen 
+BlackArch tools · Enter opens a group	BlackArch-Werkzeuge · Enter öffnet eine Gruppe
+back	zurück

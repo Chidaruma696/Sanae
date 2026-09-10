@@ -198,6 +198,9 @@ queue the group	mettre le groupe en file
 {} tools queued	{} outils en file
 Purple team	Équipe violette
 detection, forensics and hardening · from any repository	détection, forensique et durcissement · de n'importe quel dépôt
-by popularity · A queues the whole group	par popularité · A met tout le groupe en file
+by popularity · A queues the whole group · Esc back	par popularité · A met tout le groupe en file · Échap revient
  ☠ Darkside · {} · {} tools 	 ☠ Darkside · {} · {} outils 
-Darkside: with the BlackArch repository enabled, its tools by group as Store shelves · A queues a whole group	Darkside : avec le dépôt BlackArch activé, ses outils par groupe comme rayons de la Boutique · A met tout un groupe en file
+Darkside: with the BlackArch repository enabled, a ☠ shelf in the Store lists its tools by group · Enter opens a group, A queues it	Darkside : avec le dépôt BlackArch activé, un rayon ☠ de la Boutique liste ses outils par groupe · Entrée ouvre un groupe, A le met en file
+ ☠ Darkside · {} groups 	 ☠ Darkside · {} groupes 
+BlackArch tools · Enter opens a group	outils BlackArch · Entrée ouvre un groupe
+back	retour

@@ -198,6 +198,9 @@ queue the group	encolar el grupo
 {} tools queued	{} herramientas en la cola
 Purple team	Equipo púrpura
 detection, forensics and hardening · from any repository	detección, forense y endurecimiento · de cualquier repositorio
-by popularity · A queues the whole group	por popularidad · A encola el grupo entero
+by popularity · A queues the whole group · Esc back	por popularidad · A encola el grupo entero · Esc vuelve
  ☠ Darkside · {} · {} tools 	 ☠ Darkside · {} · {} herramientas 
-Darkside: with the BlackArch repository enabled, its tools by group as Store shelves · A queues a whole group	Darkside: con el repositorio BlackArch activo, sus herramientas por grupo como estantes de la Tienda · A encola un grupo entero
+Darkside: with the BlackArch repository enabled, a ☠ shelf in the Store lists its tools by group · Enter opens a group, A queues it	Darkside: con el repositorio BlackArch activo, un estante ☠ en la Tienda lista sus herramientas por grupo · Enter abre un grupo, A lo encola entero
+ ☠ Darkside · {} groups 	 ☠ Darkside · {} grupos 
+BlackArch tools · Enter opens a group	herramientas de BlackArch · Enter abre un grupo
+back	volver

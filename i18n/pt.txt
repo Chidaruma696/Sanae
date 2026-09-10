@@ -198,6 +198,9 @@ queue the group	pôr o grupo na fila
 {} tools queued	{} ferramentas na fila
 Purple team	Time roxo
 detection, forensics and hardening · from any repository	detecção, forense e hardening · de qualquer repositório
-by popularity · A queues the whole group	por popularidade · A põe o grupo inteiro na fila
+by popularity · A queues the whole group · Esc back	por popularidade · A põe o grupo inteiro na fila · Esc volta
  ☠ Darkside · {} · {} tools 	 ☠ Darkside · {} · {} ferramentas 
-Darkside: with the BlackArch repository enabled, its tools by group as Store shelves · A queues a whole group	Darkside: com o repositório BlackArch ativo, suas ferramentas por grupo como prateleiras da Loja · A põe um grupo inteiro na fila
+Darkside: with the BlackArch repository enabled, a ☠ shelf in the Store lists its tools by group · Enter opens a group, A queues it	Darkside: com o repositório BlackArch ativo, uma prateleira ☠ na Loja lista suas ferramentas por grupo · Enter abre um grupo, A põe ele todo na fila
+ ☠ Darkside · {} groups 	 ☠ Darkside · {} grupos 
+BlackArch tools · Enter opens a group	ferramentas do BlackArch · Enter abre um grupo
+back	voltar

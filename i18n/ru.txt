@@ -198,6 +198,9 @@ queue the group	группу в очередь
 {} tools queued	инструментов в очереди: {}
 Purple team	Фиолетовая команда
 detection, forensics and hardening · from any repository	обнаружение, форензика и защита · из любого репозитория
-by popularity · A queues the whole group	по популярности · A ставит всю группу в очередь
+by popularity · A queues the whole group · Esc back	по популярности · A ставит всю группу в очередь · Esc — назад
  ☠ Darkside · {} · {} tools 	 ☠ Darkside · {} · {} инструментов 
-Darkside: with the BlackArch repository enabled, its tools by group as Store shelves · A queues a whole group	Darkside: при включённом репозитории BlackArch его инструменты по группам появляются как полки Магазина · A ставит всю группу в очередь
+Darkside: with the BlackArch repository enabled, a ☠ shelf in the Store lists its tools by group · Enter opens a group, A queues it	Darkside: при включённом репозитории BlackArch полка ☠ в Магазине показывает его инструменты по группам · Enter открывает группу, A ставит её в очередь
+ ☠ Darkside · {} groups 	 ☠ Darkside · {} групп 
+BlackArch tools · Enter opens a group	инструменты BlackArch · Enter открывает группу
+back	назад
