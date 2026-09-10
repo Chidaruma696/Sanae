@@ -7,6 +7,7 @@ use ratatui::text::{Line, Span, Text};
 use ratatui::widgets::{Block, BorderType, Borders, Clear, List, ListItem, ListState, Paragraph, Tabs, Wrap};
 
 use super::{App, DetailTab, Tab};
+use crate::i18n::t;
 use crate::model::Package;
 use crate::queue::Action;
 use crate::{human, truncate};
@@ -89,7 +90,7 @@ fn draw_tabs(f: &mut Frame, app: &App, area: Rect) {
     f.render_widget(Paragraph::new(Line::from(brand)), cols[0]);
     f.render_widget(tabs, cols[1]);
     f.render_widget(
-        Paragraph::new(Line::from(Span::styled("? help  q quit", app.theme.dim()))).alignment(Alignment::Right),
+        Paragraph::new(Line::from(Span::styled(t("? help  q quit"), app.theme.dim()))).alignment(Alignment::Right),
         cols[2],
     );
 }
@@ -153,9 +154,9 @@ fn draw_search(f: &mut Frame, app: &App, area: Rect) {
         .direction(Direction::Vertical)
         .constraints([Constraint::Length(3), Constraint::Min(3)])
         .split(area);
-    let hint = if app.typing { "type · Enter or ↓ to the results" } else { "/ to type · Esc clears" };
+    let hint = if app.typing { t("type · Enter or ↓ to the results") } else { t("/ to type · Esc clears") };
     let pending = if app.aur_pending.is_some() {
-        Span::styled("  searching the AUR…", app.theme.warn())
+        Span::styled(t("  searching the AUR…"), app.theme.warn())
     } else {
         Span::raw("")
     };
@@ -168,13 +169,13 @@ fn draw_search(f: &mut Frame, app: &App, area: Rect) {
     .block(block(
         app,
         Line::from(vec![
-            Span::styled(" Search ", app.theme.title()),
+            Span::styled(t(" Search "), app.theme.title()),
             Span::styled(format!(" {hint} "), app.theme.dim()),
         ]),
         app.typing,
     ));
     f.render_widget(input, rows[0]);
-    let title = Line::from(vec![Span::styled(format!(" {} results ", app.results.len()), app.theme.title())]);
+    let title = Line::from(vec![Span::styled(tfmt!(" {} results ", app.results.len()), app.theme.title())]);
     draw_list(f, app, rows[1], &app.results, app.search_sel, title, !app.typing);
 }
 
@@ -199,23 +200,23 @@ fn draw_store(f: &mut Frame, app: &App, area: Rect) {
                 "Utilities" => "🧰",
                 _ => "·",
             };
-            ListItem::new(Line::from(format!("{icon} {name}")))
+            ListItem::new(Line::from(format!("{icon} {}", t(name))))
         })
         .collect();
     let list = List::new(shelves)
-        .block(block(app, Line::from(Span::styled(" Shelves ", app.theme.title())), app.shelf_focus))
+        .block(block(app, Line::from(Span::styled(t(" Shelves "), app.theme.title())), app.shelf_focus))
         .highlight_style(app.theme.highlight())
         .highlight_symbol("▸ ");
     let mut st = ListState::default().with_selected(Some(app.shelf_sel));
     f.render_stateful_widget(list, cols[0], &mut st);
     let shelf = app.shelf_name(app.shelf_sel);
-    let sub = if shelf == "Featured" { "most installed apps you do not have yet" } else { "by popularity" };
+    let sub = if shelf == "Featured" { t("most installed apps you do not have yet") } else { t("by popularity") };
     let title = Line::from(vec![
-        Span::styled(format!(" {shelf} · {} apps ", app.store_items.len()), app.theme.title()),
+        Span::styled(tfmt!(" {} · {} apps ", t(shelf), app.store_items.len()), app.theme.title()),
         Span::styled(format!(" {sub} "), app.theme.dim()),
     ]);
     if app.apps.is_empty() {
-        let p = Paragraph::new("No AppStream catalog found.\n\nInstall archlinux-appstream-data (sudo pacman -S archlinux-appstream-data) and press r.\nThe Search tab works without it.")
+        let p = Paragraph::new(t("No AppStream catalog found.\n\nInstall archlinux-appstream-data (sudo pacman -S archlinux-appstream-data) and press r.\nThe Search tab works without it."))
             .wrap(Wrap { trim: false })
             .block(block(app, title, !app.shelf_focus));
         f.render_widget(p, cols[1]);
@@ -226,9 +227,9 @@ fn draw_store(f: &mut Frame, app: &App, area: Rect) {
 
 fn draw_installed(f: &mut Frame, app: &App, area: Rect) {
     let title = Line::from(vec![
-        Span::styled(format!(" Installed · {} ", app.inst_filter.title()), app.theme.title()),
+        Span::styled(tfmt!(" Installed · {} ", app.inst_filter.title()), app.theme.title()),
         Span::styled(
-            format!(" {} packages · f changes the filter · o queues the orphans ", app.inst_items.len()),
+            tfmt!(" {} packages · f changes the filter · o queues the orphans ", app.inst_items.len()),
             app.theme.dim(),
         ),
     ]);
@@ -262,8 +263,8 @@ fn draw_updates(f: &mut Frame, app: &App, area: Rect) {
         let p = Paragraph::new(Text::from(lines)).block(block(
             app,
             Line::from(vec![
-                Span::styled(" Arch news ", app.theme.title()),
-                Span::styled(" read before updating ", app.theme.dim()),
+                Span::styled(t(" Arch news "), app.theme.title()),
+                Span::styled(t(" read before updating "), app.theme.dim()),
             ]),
             false,
         ));
@@ -272,17 +273,17 @@ fn draw_updates(f: &mut Frame, app: &App, area: Rect) {
     let list_area = if has_news { rows[1] } else { rows[0] };
     match &app.updates {
         None => {
-            let p = Paragraph::new("Checking for updates…").block(block(
+            let p = Paragraph::new(t("Checking for updates…")).block(block(
                 app,
-                Line::from(Span::styled(" Updates ", app.theme.title())),
+                Line::from(Span::styled(t(" Updates "), app.theme.title())),
                 true,
             ));
             f.render_widget(p, list_area);
         }
         Some(u) if u.is_empty() => {
-            let p = Paragraph::new("Everything is up to date.").block(block(
+            let p = Paragraph::new(t("Everything is up to date.")).block(block(
                 app,
-                Line::from(Span::styled(" Updates ", app.theme.title())),
+                Line::from(Span::styled(t(" Updates "), app.theme.title())),
                 true,
             ));
             f.render_widget(p, list_area);
@@ -306,8 +307,8 @@ fn draw_updates(f: &mut Frame, app: &App, area: Rect) {
                 })
                 .collect();
             let title = Line::from(vec![
-                Span::styled(format!(" {} updates ", u.len()), app.theme.title()),
-                Span::styled(" u or Enter updates everything ", app.theme.dim()),
+                Span::styled(tfmt!(" {} updates ", u.len()), app.theme.title()),
+                Span::styled(t(" u or Enter updates everything "), app.theme.dim()),
             ]);
             let list = List::new(items)
                 .block(block(app, title, true))
@@ -341,8 +342,8 @@ fn draw_queue(f: &mut Frame, app: &mut App, area: Rect) {
         })
         .collect();
     let title = Line::from(vec![
-        Span::styled(format!(" Queue · {} ", app.queue.len()), app.theme.title()),
-        Span::styled(" a applies · d drops one · c clears ", app.theme.dim()),
+        Span::styled(tfmt!(" Queue · {} ", app.queue.len()), app.theme.title()),
+        Span::styled(t(" a applies · d drops one · c clears "), app.theme.dim()),
     ]);
     let list =
         List::new(items).block(block(app, title, true)).highlight_style(app.theme.highlight()).highlight_symbol("▸ ");
@@ -351,13 +352,15 @@ fn draw_queue(f: &mut Frame, app: &mut App, area: Rect) {
 
     let mut lines: Vec<Line> = Vec::new();
     match &app.preflight {
-        None if app.queue.is_empty() => lines
-            .push(Line::from(Span::styled("Mark packages with space anywhere; they show up here.", app.theme.dim()))),
-        None => lines.push(Line::from("Asking pacman what it would do…")),
+        None if app.queue.is_empty() => lines.push(Line::from(Span::styled(
+            t("Mark packages with space anywhere; they show up here."),
+            app.theme.dim(),
+        ))),
+        None => lines.push(Line::from(t("Asking pacman what it would do…"))),
         Some(p) => {
             if !p.installs.is_empty() {
                 lines.push(Line::from(Span::styled(
-                    format!("Install ({}), {} to download", p.installs.len(), human(p.download_bytes)),
+                    tfmt!("Install ({}), {} to download", p.installs.len(), human(p.download_bytes)),
                     app.theme.accent(),
                 )));
                 for i in &p.installs {
@@ -365,7 +368,7 @@ fn draw_queue(f: &mut Frame, app: &mut App, area: Rect) {
                 }
             }
             if !p.removes.is_empty() {
-                lines.push(Line::from(Span::styled(format!("Remove ({})", p.removes.len()), app.theme.bad())));
+                lines.push(Line::from(Span::styled(tfmt!("Remove ({})", p.removes.len()), app.theme.bad())));
                 for r in &p.removes {
                     lines.push(Line::from(format!("  {r}")));
                 }
@@ -381,7 +384,7 @@ fn draw_queue(f: &mut Frame, app: &mut App, area: Rect) {
     }
     let p = Paragraph::new(Text::from(lines)).wrap(Wrap { trim: false }).scroll((app.detail_scroll, 0)).block(block(
         app,
-        Line::from(Span::styled(" What will happen ", app.theme.title())),
+        Line::from(Span::styled(t(" What will happen "), app.theme.title())),
         false,
     ));
     f.render_widget(p, cols[1]);
@@ -409,8 +412,8 @@ fn draw_recipes(f: &mut Frame, app: &App, area: Rect) {
         })
         .collect();
     let title = Line::from(vec![
-        Span::styled(" Recipes ", app.theme.title()),
-        Span::styled(" install and leave it configured · Enter applies ", app.theme.dim()),
+        Span::styled(t(" Recipes "), app.theme.title()),
+        Span::styled(t(" install and leave it configured · Enter applies "), app.theme.dim()),
     ]);
     let list =
         List::new(items).block(block(app, title, true)).highlight_style(app.theme.highlight()).highlight_symbol("▸ ");
@@ -424,38 +427,40 @@ fn draw_recipes(f: &mut Frame, app: &App, area: Rect) {
         lines.push(Line::from(""));
         if !r.packages.is_empty() {
             lines.push(Line::from(vec![
-                Span::styled("packages   ", app.theme.accent()),
+                Span::styled(t("packages   "), app.theme.accent()),
                 Span::raw(r.packages.join(" ")),
             ]));
         }
         if !r.aur.is_empty() {
-            lines.push(Line::from(vec![Span::styled("aur        ", app.theme.warn()), Span::raw(r.aur.join(" "))]));
+            lines.push(Line::from(vec![Span::styled(t("aur        "), app.theme.warn()), Span::raw(r.aur.join(" "))]));
         }
         if !r.services.is_empty() {
             lines.push(Line::from(vec![
-                Span::styled("services   ", app.theme.accent()),
+                Span::styled(t("services   "), app.theme.accent()),
                 Span::raw(r.services.join(" ")),
             ]));
         }
         if !r.groups.is_empty() {
-            lines
-                .push(Line::from(vec![Span::styled("groups     ", app.theme.accent()), Span::raw(r.groups.join(" "))]));
+            lines.push(Line::from(vec![
+                Span::styled(t("groups     "), app.theme.accent()),
+                Span::raw(r.groups.join(" ")),
+            ]));
         }
         if !r.files.is_empty() {
             lines.push(Line::from(vec![
-                Span::styled("files      ", app.theme.accent()),
+                Span::styled(t("files      "), app.theme.accent()),
                 Span::raw(r.files.iter().map(|f| f.path.clone()).collect::<Vec<_>>().join(" ")),
             ]));
         }
         if !r.env.is_empty() {
             lines.push(Line::from(vec![
-                Span::styled("environment", app.theme.accent()),
+                Span::styled(t("environment"), app.theme.accent()),
                 Span::raw(format!(" {}", r.env.join(" "))),
             ]));
         }
         if !r.commands.is_empty() {
             lines.push(Line::from(vec![
-                Span::styled("commands   ", app.theme.accent()),
+                Span::styled(t("commands   "), app.theme.accent()),
                 Span::raw(r.commands.iter().map(|c| c.run.clone()).collect::<Vec<_>>().join(" ; ")),
             ]));
         }
@@ -465,14 +470,14 @@ fn draw_recipes(f: &mut Frame, app: &App, area: Rect) {
         }
         match app.recipe_status.get(&r.id) {
             Some(true) => lines
-                .push(Line::from(Span::styled("\nAlready applied. Enter applies it again (safe).", app.theme.ok()))),
-            Some(false) => lines.push(Line::from(Span::styled("\nNot applied yet.", app.theme.dim()))),
+                .push(Line::from(Span::styled(t("\nAlready applied. Enter applies it again (safe)."), app.theme.ok()))),
+            Some(false) => lines.push(Line::from(Span::styled(t("\nNot applied yet."), app.theme.dim()))),
             None => {}
         }
     }
     let p = Paragraph::new(Text::from(lines)).wrap(Wrap { trim: false }).block(block(
         app,
-        Line::from(Span::styled(" What it does ", app.theme.title())),
+        Line::from(Span::styled(t(" What it does "), app.theme.title())),
         false,
     ));
     f.render_widget(p, cols[1]);
@@ -480,30 +485,30 @@ fn draw_recipes(f: &mut Frame, app: &App, area: Rect) {
 
 fn draw_details(f: &mut Frame, app: &mut App, area: Rect) {
     let Some(name) = app.current_name().map(String::from) else {
-        let p = Paragraph::new(Line::from(Span::styled("Nothing selected.", app.theme.dim()))).block(block(
+        let p = Paragraph::new(Line::from(Span::styled(t("Nothing selected."), app.theme.dim()))).block(block(
             app,
-            Line::from(Span::styled(" Details ", app.theme.title())),
+            Line::from(Span::styled(t(" Details "), app.theme.title())),
             false,
         ));
         f.render_widget(p, area);
         return;
     };
     let Some(pkg) = app.index.get(&name).cloned() else { return };
-    let t = app.theme.clone();
+    let th = app.theme.clone();
     let tabs: Vec<Span> = DetailTab::ALL
         .iter()
         .map(|d| {
             if *d == app.detail_tab {
-                Span::styled(format!(" {} ", d.title()), t.highlight())
+                Span::styled(format!(" {} ", d.title()), th.highlight())
             } else {
-                Span::styled(format!(" {} ", d.title()), t.dim())
+                Span::styled(format!(" {} ", d.title()), th.dim())
             }
         })
         .collect();
     let mut title =
-        vec![Span::styled(format!(" {} ", pkg.name), t.title()), Span::styled(format!("{} ", pkg.version), t.dim())];
+        vec![Span::styled(format!(" {} ", pkg.name), th.title()), Span::styled(format!("{} ", pkg.version), th.dim())];
     title.extend(tabs);
-    title.push(Span::styled(" Tab switches ", t.dim()));
+    title.push(Span::styled(t(" Tab switches "), th.dim()));
 
     let mut lines: Vec<Line> = Vec::new();
     match app.detail_tab {
@@ -512,124 +517,127 @@ fn draw_details(f: &mut Frame, app: &mut App, area: Rect) {
             if let Some(a) = app_info {
                 lines.push(Line::from(vec![
                     Span::styled(a.name.clone(), Style::new().add_modifier(Modifier::BOLD)),
-                    Span::styled(format!("  ·  {}", a.summary), t.dim()),
+                    Span::styled(format!("  ·  {}", a.summary), th.dim()),
                 ]));
             }
             lines.push(Line::from(pkg.description.clone()));
             lines.push(Line::from(""));
             let mut facts: Vec<(&str, String)> = Vec::new();
-            facts.push(("source", pkg.source.label().to_string()));
+            facts.push((t("source"), pkg.source.label().to_string()));
             match &pkg.installed {
                 Some(i) => facts.push((
-                    "installed",
+                    t("installed"),
                     format!(
                         "{} · {}{}",
                         i.version,
-                        if i.explicit { "explicitly" } else { "as a dependency" },
+                        if i.explicit { t("explicitly") } else { t("as a dependency") },
                         i.install_date.map(|d| format!(" · {}", crate::date(d))).unwrap_or_default()
                     ),
                 )),
-                None => facts.push(("installed", "no".into())),
+                None => facts.push((t("installed"), t("no").into())),
             }
             if let Some(s) = pkg.install_size {
                 facts.push((
-                    "size",
+                    t("size"),
                     format!(
-                        "{} installed{}",
-                        human(s),
-                        pkg.download_size.map(|d| format!(", {} download", human(d))).unwrap_or_default()
+                        "{}{}",
+                        tfmt!("{} installed", human(s)),
+                        pkg.download_size.map(|d| tfmt!(", {} download", human(d))).unwrap_or_default()
                     ),
                 ));
             }
             if let Some(p) = pkg.popularity {
                 facts.push((
-                    "popularity",
+                    t("popularity"),
                     if pkg.source.is_aur() {
-                        format!("{p:.2} · {} votes", pkg.votes.unwrap_or(0))
+                        tfmt!("{} · {} votes", format!("{p:.2}"), pkg.votes.unwrap_or(0))
                     } else {
-                        format!("{p:.1}% of Arch systems have it")
+                        tfmt!("{}% of Arch systems have it", format!("{p:.1}"))
                     },
                 ));
             }
             if !pkg.licenses.is_empty() {
-                facts.push(("license", pkg.licenses.join(", ")));
+                facts.push((t("license"), pkg.licenses.join(", ")));
             }
             if let Some(u) = &pkg.url {
-                facts.push(("url", u.clone()));
+                facts.push((t("url"), u.clone()));
             }
             if let Some(m) = &pkg.maintainer {
-                facts.push(("maintainer", m.clone()));
+                facts.push((t("maintainer"), m.clone()));
             }
             if let Some(o) = pkg.out_of_date {
-                facts.push(("flagged", format!("OUT OF DATE since {}", crate::date(o))));
+                facts.push((t("flagged"), tfmt!("OUT OF DATE since {}", crate::date(o))));
             }
             if !pkg.groups.is_empty() {
-                facts.push(("groups", pkg.groups.join(", ")));
+                facts.push((t("groups"), pkg.groups.join(", ")));
             }
             if let Some(a) = app_info {
                 if !a.categories.is_empty() {
-                    facts.push(("categories", a.categories.join(", ")));
+                    facts.push((t("categories"), a.categories.join(", ")));
                 }
                 if !a.screenshots.is_empty() {
-                    facts.push(("screenshots", a.screenshots.join("  ")));
+                    facts.push((t("screenshots"), a.screenshots.join("  ")));
                 }
             }
             if let Some(d) = app.details.get(&name)
                 && let Some(b) = d.build_date
             {
                 facts.push((
-                    "built",
+                    t("built"),
                     format!(
                         "{}{}",
                         crate::date(b),
-                        d.packager.as_ref().map(|p| format!(" by {p}")).unwrap_or_default()
+                        d.packager.as_ref().map(|p| tfmt!(" by {}", p)).unwrap_or_default()
                     ),
                 ));
             }
             for (k, v) in facts {
-                lines.push(Line::from(vec![Span::styled(format!("{k:<12}"), t.accent()), Span::raw(v)]));
+                lines.push(Line::from(vec![
+                    Span::styled(format!("{:<12}", crate::i18n::t(k)), th.accent()),
+                    Span::raw(v),
+                ]));
             }
         }
         DetailTab::Deps => match app.details.get(&name) {
-            None => lines.push(Line::from(Span::styled("loading…", t.dim()))),
+            None => lines.push(Line::from(Span::styled(t("loading…"), th.dim()))),
             Some(d) => {
                 let section = |lines: &mut Vec<Line>, title: &str, items: &[String]| {
                     if items.is_empty() {
                         return;
                     }
-                    lines.push(Line::from(Span::styled(title.to_string(), t.accent())));
+                    lines.push(Line::from(Span::styled(title.to_string(), th.accent())));
                     let mut spans = vec![Span::raw("  ")];
                     for it in items {
                         let bare = it.split(['>', '<', '=', ':']).next().unwrap_or(it);
                         let inst = app.index.get(bare).is_some_and(|p| p.is_installed());
-                        spans.push(Span::styled(it.clone(), if inst { t.ok() } else { Style::new() }));
+                        spans.push(Span::styled(it.clone(), if inst { th.ok() } else { Style::new() }));
                         spans.push(Span::raw("  "));
                     }
                     lines.push(Line::from(spans));
                 };
-                section(&mut lines, "depends on", &d.depends);
-                section(&mut lines, "optional", &d.opt_depends);
-                section(&mut lines, "build needs", &d.make_depends);
-                section(&mut lines, "provides", &d.provides);
-                section(&mut lines, "conflicts", &d.conflicts);
-                section(&mut lines, "required by", &d.required_by);
-                section(&mut lines, "optional for", &d.optional_for);
+                section(&mut lines, t("depends on"), &d.depends);
+                section(&mut lines, t("optional"), &d.opt_depends);
+                section(&mut lines, t("build needs"), &d.make_depends);
+                section(&mut lines, t("provides"), &d.provides);
+                section(&mut lines, t("conflicts"), &d.conflicts);
+                section(&mut lines, t("required by"), &d.required_by);
+                section(&mut lines, t("optional for"), &d.optional_for);
                 if lines.is_empty() {
-                    lines.push(Line::from(Span::styled("no dependencies", t.dim())));
+                    lines.push(Line::from(Span::styled(t("no dependencies"), th.dim())));
                 } else {
-                    lines.push(Line::from(Span::styled("green = installed", t.dim())));
+                    lines.push(Line::from(Span::styled(t("green = installed"), th.dim())));
                 }
             }
         },
         DetailTab::Files => match app.files.get(&name) {
-            None => lines.push(Line::from(Span::styled("loading…", t.dim()))),
+            None => lines.push(Line::from(Span::styled(t("loading…"), th.dim()))),
             Some(files) => {
-                lines.push(Line::from(Span::styled(format!("{} files", files.len()), t.dim())));
+                lines.push(Line::from(Span::styled(tfmt!("{} files", files.len()), th.dim())));
                 lines.extend(files.iter().map(|f| Line::from(f.clone())));
             }
         },
         DetailTab::Pkgbuild => match app.pkgbuilds.get(&name) {
-            None => lines.push(Line::from(Span::styled("loading…", t.dim()))),
+            None => lines.push(Line::from(Span::styled(t("loading…"), th.dim()))),
             Some(text) => lines.extend(text.lines().map(|l| Line::from(l.to_string()))),
         },
     }
@@ -647,7 +655,7 @@ fn draw_status(f: &mut Frame, app: &App, area: Rect) {
     } else if !app.status.is_empty() {
         Span::styled(format!(" {}", app.status), app.theme.accent2())
     } else {
-        Span::styled(" Made by Chidaruma · like it? star it at github.com/Chidaruma696", app.theme.dim())
+        Span::styled(t(" Made by Chidaruma · like it? star it at github.com/Chidaruma696"), app.theme.dim())
     };
     f.render_widget(Paragraph::new(Line::from(left)), area);
 }
@@ -656,50 +664,55 @@ fn draw_status(f: &mut Frame, app: &App, area: Rect) {
 fn draw_keys(f: &mut Frame, app: &App, area: Rect) {
     let keys: &[(&str, &str)] = match app.tab {
         Tab::Store => &[
-            ("←→", "shelves/apps"),
-            ("↑↓", "move"),
-            ("space", "mark"),
-            ("i", "install now"),
-            ("Enter", "open"),
-            ("Tab", "details"),
-            ("a", "apply queue"),
-            ("?", "help"),
-            ("q", "quit"),
+            ("←→", t("shelves/apps")),
+            ("↑↓", t("move")),
+            ("space", t("mark")),
+            ("i", t("install now")),
+            ("Enter", t("open")),
+            ("Tab", t("details")),
+            ("a", t("apply queue")),
+            ("?", t("help")),
+            ("q", t("quit")),
         ],
         Tab::Search => &[
-            ("/", "type"),
-            ("↑↓", "move"),
-            ("space", "mark"),
-            ("d", "mark remove"),
-            ("i", "install now"),
-            ("Tab", "details"),
-            ("a", "apply queue"),
-            ("?", "help"),
-            ("q", "quit"),
+            ("/", t("type")),
+            ("↑↓", t("move")),
+            ("space", t("mark")),
+            ("d", t("mark remove")),
+            ("i", t("install now")),
+            ("Tab", t("details")),
+            ("a", t("apply queue")),
+            ("?", t("help")),
+            ("q", t("quit")),
         ],
         Tab::Installed => &[
-            ("f", "filter"),
-            ("↑↓", "move"),
-            ("space/d", "mark remove"),
-            ("o", "queue orphans"),
-            ("Tab", "details"),
-            ("a", "apply queue"),
-            ("?", "help"),
-            ("q", "quit"),
+            ("f", t("filter")),
+            ("↑↓", t("move")),
+            ("space/d", t("mark remove")),
+            ("o", t("queue orphans")),
+            ("Tab", t("details")),
+            ("a", t("apply queue")),
+            ("?", t("help")),
+            ("q", t("quit")),
         ],
         Tab::Updates => &[
-            ("u/Enter", "update everything"),
-            ("↑↓", "move"),
-            ("Tab", "details"),
-            ("r", "reload"),
-            ("?", "help"),
-            ("q", "quit"),
+            ("u/Enter", t("update everything")),
+            ("↑↓", t("move")),
+            ("Tab", t("details")),
+            ("r", t("reload")),
+            ("?", t("help")),
+            ("q", t("quit")),
         ],
-        Tab::Queue => {
-            &[("a/Enter", "apply"), ("d", "drop line"), ("c", "clear"), ("←→", "scroll"), ("?", "help"), ("q", "quit")]
-        }
-        Tab::Recipes => &[("↑↓", "move"), ("Enter", "apply recipe"), ("?", "help"), ("q", "quit")],
-        Tab::Settings => &[("↑↓", "move"), ("Enter", "toggle / apply"), ("?", "help"), ("q", "quit")],
+        Tab::Queue => &[
+            ("a/Enter", t("apply")),
+            ("d", t("drop line")),
+            ("c", t("clear")),
+            ("←→", t("scroll")),
+            ("?", t("help")),
+            ("q", t("quit")),
+        ],
+        Tab::Recipes => &[("↑↓", t("move")), ("Enter", t("apply recipe")), ("?", t("help")), ("q", t("quit"))],
+        Tab::Settings => &[("↑↓", t("move")), ("Enter", t("toggle / apply")), ("?", t("help")), ("q", t("quit"))],
     };
     let mut spans = Vec::new();
     for (k, what) in keys {
@@ -732,8 +745,8 @@ fn draw_settings(f: &mut Frame, app: &App, area: Rect) {
         items.push(ListItem::new(Line::from(vec![Span::styled(format!("{mark} "), style), Span::raw(r.name.clone())])));
     }
     let title = Line::from(vec![
-        Span::styled(" Settings ", app.theme.title()),
-        Span::styled(" Enter toggles a setting or enables a source ", app.theme.dim()),
+        Span::styled(t(" Settings "), app.theme.title()),
+        Span::styled(t(" Enter toggles a setting or enables a source "), app.theme.dim()),
     ]);
     let list =
         List::new(items).block(block(app, title, true)).highlight_style(app.theme.highlight()).highlight_symbol("▸ ");
@@ -746,17 +759,18 @@ fn draw_settings(f: &mut Frame, app: &App, area: Rect) {
         lines.push(Line::from(Span::styled(label.clone(), app.theme.title())));
         lines.push(Line::from(""));
         let text = match *id {
-            "check_updates" => {
-                "Once every few hours Sanae asks GitHub whether a newer release exists and tells you in the status line. Nothing is downloaded until you ask."
-            }
-            "self_update" => {
-                "Downloads the latest release binary and replaces this one (needs your password). Sanae is a single file, so this is the whole update."
-            }
+            "check_updates" => t(
+                "Once every few hours Sanae asks GitHub whether a newer release exists and tells you in the status line. Nothing is downloaded until you ask.",
+            ),
+            "self_update" => t(
+                "Downloads the latest release binary and replaces this one (needs your password). Sanae is a single file, so this is the whole update.",
+            ),
             "aur_helper" => {
-                "The program that builds AUR packages for you: paru or yay. Auto picks whichever is installed."
+                t("The program that builds AUR packages for you: paru or yay. Auto picks whichever is installed.")
             }
-            "privilege" => "How Sanae becomes root to run pacman: sudo or doas. Auto picks whichever is installed.",
-            "nerd_font" => "Use Nerd Font glyphs for the marks in lists. Only if your terminal font has them.",
+            "privilege" => t("How Sanae becomes root to run pacman: sudo or doas. Auto picks whichever is installed."),
+            "nerd_font" => t("Use Nerd Font glyphs for the marks in lists. Only if your terminal font has them."),
+            "language" => t("The language of this interface: English, Spanish, or whatever the system asks for."),
             _ => "",
         };
         lines.push(Line::from(text));
@@ -766,16 +780,16 @@ fn draw_settings(f: &mut Frame, app: &App, area: Rect) {
         lines.push(Line::from(""));
         if !r.packages.is_empty() {
             lines.push(Line::from(vec![
-                Span::styled("packages   ", app.theme.accent()),
+                Span::styled(t("packages   "), app.theme.accent()),
                 Span::raw(r.packages.join(" ")),
             ]));
         }
         if !r.aur.is_empty() {
-            lines.push(Line::from(vec![Span::styled("aur        ", app.theme.warn()), Span::raw(r.aur.join(" "))]));
+            lines.push(Line::from(vec![Span::styled(t("aur        "), app.theme.warn()), Span::raw(r.aur.join(" "))]));
         }
         if !r.commands.is_empty() {
             lines.push(Line::from(vec![
-                Span::styled("commands   ", app.theme.accent()),
+                Span::styled(t("commands   "), app.theme.accent()),
                 Span::raw(r.commands.iter().map(|c| c.run.clone()).collect::<Vec<_>>().join(" ; ")),
             ]));
         }
@@ -784,25 +798,25 @@ fn draw_settings(f: &mut Frame, app: &App, area: Rect) {
             lines.push(Line::from(Span::styled(n.clone(), app.theme.warn())));
         }
         match app.recipe_status.get(&r.id) {
-            Some(true) => lines.push(Line::from(Span::styled("\nAlready enabled.", app.theme.ok()))),
-            Some(false) => lines.push(Line::from(Span::styled("\nNot enabled. Enter enables it.", app.theme.dim()))),
+            Some(true) => lines.push(Line::from(Span::styled(t("\nAlready enabled."), app.theme.ok()))),
+            Some(false) => lines.push(Line::from(Span::styled(t("\nNot enabled. Enter enables it."), app.theme.dim()))),
             None => {}
         }
     }
     lines.push(Line::from(""));
     lines.push(Line::from(Span::styled(
-        "⚠ Third-party repositories, the AUR, Flatpak and Snap are not reviewed by Arch Linux.",
+        t("⚠ Third-party repositories, the AUR, Flatpak and Snap are not reviewed by Arch Linux."),
         app.theme.warn(),
     )));
-    lines.push(Line::from(Span::styled("  A package from them can break an update or ship anything. Enable only what you understand, and read PKGBUILDs before building.", app.theme.warn())));
+    lines.push(Line::from(Span::styled(t("  A package from them can break an update or ship anything. Enable only what you understand, and read PKGBUILDs before building."), app.theme.warn())));
     lines.push(Line::from(""));
     lines.push(Line::from(Span::styled(
-        "Sanae and Reimu are made by Chidaruma. Do you like them? Visit github.com/Chidaruma696 and leave a star.",
+        t("Sanae and Reimu are made by Chidaruma. Do you like them? Visit github.com/Chidaruma696 and leave a star."),
         app.theme.dim(),
     )));
     let p = Paragraph::new(Text::from(lines)).wrap(Wrap { trim: false }).block(block(
         app,
-        Line::from(Span::styled(" About ", app.theme.title())),
+        Line::from(Span::styled(t(" About "), app.theme.title())),
         false,
     ));
     f.render_widget(p, cols[1]);
@@ -817,7 +831,7 @@ fn draw_run(f: &mut Frame, app: &App, area: Rect) {
     let step = run.steps.get(run.current);
     let head = Line::from(vec![
         Span::styled(format!(" {} ", run.title), app.theme.title()),
-        Span::styled(format!(" step {}/{} ", run.current + 1, run.steps.len()), app.theme.dim()),
+        Span::styled(tfmt!(" step {}/{} ", run.current + 1, run.steps.len()), app.theme.dim()),
         Span::raw(step.map(|s| s.title.clone()).unwrap_or_default()),
     ]);
     f.render_widget(Paragraph::new(head).block(block(app, Line::from(""), true)), rows[0]);
@@ -830,18 +844,18 @@ fn draw_run(f: &mut Frame, app: &App, area: Rect) {
     }
     let p = Paragraph::new(Text::from(shown)).wrap(Wrap { trim: false }).block(block(
         app,
-        Line::from(Span::styled(" output ", app.theme.dim())),
+        Line::from(Span::styled(t(" output "), app.theme.dim())),
         false,
     ));
     f.render_widget(p, rows[1]);
     let foot = if run.finished {
         if run.failed {
-            Span::styled(" ✖ failed · Enter or Esc to go back ", app.theme.bad())
+            Span::styled(t(" ✖ failed · Enter or Esc to go back "), app.theme.bad())
         } else {
-            Span::styled(" ✔ done · Enter or Esc to go back ", app.theme.ok())
+            Span::styled(t(" ✔ done · Enter or Esc to go back "), app.theme.ok())
         }
     } else {
-        Span::styled(" running · type here to answer prompts (sudo password) · Ctrl+C cancels ", app.theme.dim())
+        Span::styled(t(" running · type here to answer prompts (sudo password) · Ctrl+C cancels "), app.theme.dim())
     };
     f.render_widget(Paragraph::new(Line::from(foot)), rows[2]);
 }
@@ -855,35 +869,35 @@ fn draw_help(f: &mut Frame, app: &App, area: Rect) {
     let lines = vec![
         Line::from(vec![
             k("1-7"),
-            Span::raw("tabs: Store · Search · Installed · Updates · Queue · Recipes · Settings"),
+            Span::raw(t("tabs: Store · Search · Installed · Updates · Queue · Recipes · Settings")),
         ]),
-        Line::from(vec![k("/"), Span::raw("search (Esc or Enter leaves the input)")]),
-        Line::from(vec![k("↑↓ j k"), Span::raw("move · PgUp/PgDn · g/G first/last")]),
-        Line::from(vec![k("← →"), Span::raw("Store: shelves / apps · elsewhere: scroll details")]),
-        Line::from(vec![k("space"), Span::raw("mark for install (or remove, if installed)")]),
-        Line::from(vec![k("d"), Span::raw("mark for removal · in the queue: drop the line")]),
-        Line::from(vec![k("i"), Span::raw("install the selected package right now")]),
-        Line::from(vec![k("a"), Span::raw("apply the queue")]),
-        Line::from(vec![k("u"), Span::raw("update everything (repos, then AUR)")]),
-        Line::from(vec![k("Tab"), Span::raw("details: Info · Dependencies · Files · PKGBUILD")]),
-        Line::from(vec![k("f / o"), Span::raw("Installed: filter · queue all orphans")]),
-        Line::from(vec![k("r"), Span::raw("reload the package databases")]),
-        Line::from(vec![k("q"), Span::raw("quit")]),
-        Line::from(vec![k("7"), Span::raw("Settings: self-update, AUR helper, Flatpak, Snap, extra repositories")]),
+        Line::from(vec![k("/"), Span::raw(t("search (Esc or Enter leaves the input)"))]),
+        Line::from(vec![k("↑↓ j k"), Span::raw(t("move · PgUp/PgDn · g/G first/last"))]),
+        Line::from(vec![k("← →"), Span::raw(t("Store: shelves / apps · elsewhere: scroll details"))]),
+        Line::from(vec![k("space"), Span::raw(t("mark for install (or remove, if installed)"))]),
+        Line::from(vec![k("d"), Span::raw(t("mark for removal · in the queue: drop the line"))]),
+        Line::from(vec![k("i"), Span::raw(t("install the selected package right now"))]),
+        Line::from(vec![k("a"), Span::raw(t("apply the queue"))]),
+        Line::from(vec![k("u"), Span::raw(t("update everything (repos, then AUR)"))]),
+        Line::from(vec![k("Tab"), Span::raw(t("details: Info · Dependencies · Files · PKGBUILD"))]),
+        Line::from(vec![k("f / o"), Span::raw(t("Installed: filter · queue all orphans"))]),
+        Line::from(vec![k("r"), Span::raw(t("reload the package databases"))]),
+        Line::from(vec![k("q"), Span::raw(t("quit"))]),
+        Line::from(vec![k("7"), Span::raw(t("Settings: self-update, AUR helper, Flatpak, Snap, extra repositories"))]),
         Line::from(""),
-        Line::from(Span::styled("Made by Chidaruma · github.com/Chidaruma696", app.theme.accent())),
+        Line::from(Span::styled(t("Made by Chidaruma · github.com/Chidaruma696"), app.theme.accent())),
         Line::from(Span::styled(
-            "While a command runs, keys go to it (sudo asks there). Ctrl+C cancels.",
+            t("While a command runs, keys go to it (sudo asks there). Ctrl+C cancels."),
             app.theme.dim(),
         )),
         Line::from(Span::styled(
-            format!("{} packages known · config: {}", app.index.len(), app.cfg_path()),
+            tfmt!("{} packages known · config: {}", app.index.len(), app.cfg_path()),
             app.theme.dim(),
         )),
     ];
     let p = Paragraph::new(Text::from(lines)).wrap(Wrap { trim: false }).block(block(
         app,
-        Line::from(Span::styled(" Keys · any key closes ", app.theme.title())),
+        Line::from(Span::styled(t(" Keys · any key closes "), app.theme.title())),
         true,
     ));
     f.render_widget(p, popup);
