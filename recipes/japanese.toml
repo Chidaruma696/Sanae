@@ -1,0 +1,7 @@
+name = "Japanese input"
+summary = "fcitx5 with Mozc, CJK fonts, and the environment variables every toolkit needs"
+category = "Language"
+packages = ["fcitx5-im", "fcitx5-mozc", "noto-fonts-cjk", "otf-ipafont"]
+env = ["GTK_IM_MODULE=fcitx", "QT_IM_MODULE=fcitx", "XMODIFIERS=@im=fcitx", "SDL_IM_MODULE=fcitx"]
+check = "pacman -Qq fcitx5-mozc >/dev/null 2>&1 && grep -q '^XMODIFIERS=@im=fcitx' /etc/environment"
+notes = "Log out and back in, then add Mozc in fcitx5-configtool. Ctrl+Space switches input."

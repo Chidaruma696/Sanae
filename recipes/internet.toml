@@ -1,0 +1,5 @@
+name = "Internet"
+summary = "Firefox, Chromium, qBittorrent, Telegram, Discord, Signal, FileZilla, Remmina"
+category = "Internet"
+packages = ["firefox", "chromium", "qbittorrent", "telegram-desktop", "discord", "signal-desktop", "filezilla", "remmina", "freerdp"]
+check = "pacman -Qq firefox >/dev/null 2>&1"

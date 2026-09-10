@@ -1,0 +1,6 @@
+name = "Multimedia"
+summary = "VLC, mpv, yt-dlp, every GStreamer codec, OBS Studio, Audacity, Kdenlive, HandBrake, Spotify"
+category = "Multimedia"
+packages = ["vlc", "mpv", "yt-dlp", "ffmpeg", "gst-plugins-good", "gst-plugins-bad", "gst-plugins-ugly", "gst-libav", "obs-studio", "audacity", "kdenlive", "handbrake"]
+aur = ["spotify"]
+check = "pacman -Qq vlc mpv >/dev/null 2>&1"

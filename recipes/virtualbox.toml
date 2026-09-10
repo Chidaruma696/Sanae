@@ -1,0 +1,10 @@
+name = "VirtualBox"
+summary = "VirtualBox with the kernel modules for the stock kernel and your user in vboxusers"
+category = "System"
+packages = ["virtualbox", "virtualbox-host-modules-arch", "virtualbox-guest-iso"]
+groups = ["vboxusers"]
+check = "pacman -Qq virtualbox >/dev/null 2>&1 && id -nG | grep -qw vboxusers"
+notes = "Using linux-lts or linux-zen? Install virtualbox-host-dkms and the matching headers instead."
+
+[[commands]]
+run = "modprobe vboxdrv 2>/dev/null || true"

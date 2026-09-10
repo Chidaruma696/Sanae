@@ -28,6 +28,21 @@ pub enum SearchBy {
 }
 
 impl SearchBy {
+    pub fn parse(s: &str) -> Option<Self> {
+        Some(match s {
+            "name" => SearchBy::Name,
+            "name-desc" | "" => SearchBy::NameDesc,
+            "maintainer" => SearchBy::Maintainer,
+            "depends" => SearchBy::Depends,
+            "makedepends" => SearchBy::MakeDepends,
+            "optdepends" => SearchBy::OptDepends,
+            "provides" => SearchBy::Provides,
+            "keywords" => SearchBy::Keywords,
+            "groups" => SearchBy::Groups,
+            _ => return None,
+        })
+    }
+
     fn as_str(self) -> &'static str {
         match self {
             SearchBy::Name => "name",

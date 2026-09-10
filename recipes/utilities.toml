@@ -1,0 +1,5 @@
+name = "Utilities"
+summary = "btop, ncdu, tree, GParted, GNOME Disks, Timeshift, File Roller, tldr"
+category = "System"
+packages = ["btop", "ncdu", "tree", "gparted", "gnome-disk-utility", "timeshift", "file-roller", "tldr"]
+check = "pacman -Qq btop gparted >/dev/null 2>&1"

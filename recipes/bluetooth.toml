@@ -1,0 +1,6 @@
+name = "Bluetooth"
+summary = "BlueZ with the service enabled and the Blueman tray applet"
+category = "System"
+packages = ["bluez", "bluez-utils", "blueman"]
+services = ["bluetooth.service"]
+check = "systemctl is-enabled bluetooth.service >/dev/null 2>&1"

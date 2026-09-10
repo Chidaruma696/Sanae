@@ -1,0 +1,11 @@
+name = "Virtual machines (QEMU/KVM)"
+summary = "QEMU with KVM, libvirt, virt-manager, UEFI firmware and TPM, ready to create a VM"
+category = "System"
+packages = ["qemu-full", "libvirt", "virt-manager", "dnsmasq", "edk2-ovmf", "swtpm", "bridge-utils", "openbsd-netcat"]
+services = ["libvirtd.service"]
+groups = ["libvirt", "kvm"]
+check = "systemctl is-enabled libvirtd.service >/dev/null 2>&1 && id -nG | grep -qw libvirt"
+notes = "Log out and back in for the libvirt group. The default NAT network starts with virt-manager."
+
+[[commands]]
+run = "virsh net-autostart default >/dev/null 2>&1 || true"

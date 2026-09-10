@@ -1,0 +1,30 @@
+name = "XFCE theme: Greybird"
+summary = "Greybird GTK and window theme with elementary icons, set as your user's default (the next login applies it)"
+category = "Look"
+packages = ["elementary-icon-theme"]
+aur = ["greybird-gtk-theme"]
+check = "test -d /usr/share/themes/Greybird-dark && grep -q 'Greybird-dark' ~/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml 2>/dev/null"
+notes = "Applies at the next XFCE login. Change it any time in Settings > Appearance."
+
+[[files]]
+path = "~/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml"
+user = true
+content = """<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xsettings" version="1.0">
+  <property name="Net" type="empty">
+    <property name="ThemeName" type="string" value="Greybird-dark"/>
+    <property name="IconThemeName" type="string" value="elementary"/>
+  </property>
+</channel>
+"""
+
+[[files]]
+path = "~/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml"
+user = true
+content = """<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xfwm4" version="1.0">
+  <property name="general" type="empty">
+    <property name="theme" type="string" value="Greybird-dark"/>
+  </property>
+</channel>
+"""

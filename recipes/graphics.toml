@@ -1,0 +1,5 @@
+name = "Graphics"
+summary = "GIMP, Inkscape, Krita, Blender, darktable, ImageMagick"
+category = "Graphics"
+packages = ["gimp", "inkscape", "krita", "blender", "darktable", "imagemagick"]
+check = "pacman -Qq gimp inkscape >/dev/null 2>&1"

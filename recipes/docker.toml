@@ -1,0 +1,8 @@
+name = "Docker"
+summary = "Docker engine with Compose and Buildx, the service enabled and your user in the docker group"
+category = "Development"
+packages = ["docker", "docker-compose", "docker-buildx"]
+services = ["docker.service"]
+groups = ["docker"]
+check = "systemctl is-enabled docker.service >/dev/null 2>&1 && id -nG | grep -qw docker"
+notes = "Log out and back in so the docker group applies. Then: docker run hello-world"

@@ -1,0 +1,7 @@
+name = "Printing"
+summary = "CUPS with PDF printing, filters, Ghostscript and the printer settings tool"
+category = "System"
+packages = ["cups", "cups-pdf", "cups-filters", "ghostscript", "gsfonts", "system-config-printer"]
+services = ["cups.socket"]
+check = "systemctl is-enabled cups.socket >/dev/null 2>&1"
+notes = "Network printers appear on their own; for USB ones open Print Settings."
