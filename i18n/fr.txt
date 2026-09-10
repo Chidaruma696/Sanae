@@ -62,8 +62,8 @@ groups     	groupes
 files      	fichiers   
 environment	environn.  
 commands   	commandes  
-\nAlready applied. Enter applies it again (safe).	\nDéjà appliquée. Entrée l'applique à nouveau (sans risque).
-\nNot applied yet.	\nPas encore appliquée.
+Already applied. Enter applies it again (safe).	Déjà appliquée. Entrée l'applique à nouveau (sans risque).
+Not applied yet.	Pas encore appliquée.
  What it does 	 Ce qu'elle fait 
 Nothing selected.	Rien de sélectionné.
  Details 	 Détails 
@@ -145,10 +145,8 @@ The program that builds AUR packages for you: paru or yay. Auto picks whichever 
 How Sanae becomes root to run pacman: sudo or doas. Auto picks whichever is installed.	Comment Sanae devient root pour lancer pacman : sudo ou doas. Auto prend celui qui est installé.
 Use Nerd Font glyphs for the marks in lists. Only if your terminal font has them.	Utiliser des glyphes Nerd Font pour les marques des listes. Seulement si votre police de terminal les a.
 The language of this interface. Auto follows the system language.	La langue de cette interface. Auto suit la langue du système.
-\nAlready enabled.	\nDéjà activée.
-\nNot enabled. Enter enables it.	\nPas activée. Entrée l'active.
-⚠ Third-party repositories, the AUR, Flatpak and Snap are not reviewed by Arch Linux.	⚠ Les dépôts tiers, l'AUR, Flatpak et Snap ne sont pas relus par Arch Linux.
-  A package from them can break an update or ship anything. Enable only what you understand, and read PKGBUILDs before building.	  Un paquet venu de là peut casser une mise à jour ou contenir n'importe quoi. N'activez que ce que vous comprenez, et lisez les PKGBUILD avant de compiler.
+Already enabled.	Déjà activée.
+Not enabled. Enter enables it.	Pas activée. Entrée l'active.
 Sanae and Reimu are made by Chidaruma. Do you like them? Visit github.com/Chidaruma696 and leave a star.	Sanae et Reimu sont créés par Chidaruma. Ça vous plaît ? Passez sur github.com/Chidaruma696 et laissez une étoile.
  About 	 À propos 
  step {}/{} 	 étape {}/{} 
@@ -168,7 +166,6 @@ update everything (repos, then AUR)	tout mettre à jour (dépôts, puis AUR)
 details: Info · Dependencies · Files · PKGBUILD	détails : Infos · Dépendances · Fichiers · PKGBUILD
 Installed: filter · queue all orphans	Installés : filtre · mettre tous les orphelins en file
 reload the package databases	recharger les bases de paquets
-Settings: self-update, AUR helper, Flatpak, Snap, extra repositories	Réglages : mise à jour automatique, assistant AUR, Flatpak, Snap, dépôts supplémentaires
 While a command runs, keys go to it (sudo asks there). Ctrl+C cancels.	Pendant qu'une commande tourne, les touches lui sont envoyées (sudo demande là). Ctrl+C annule.
 {} packages known · config: {}	{} paquets connus · config : {}
  Keys · any key closes 	 Touches · n'importe quelle touche ferme 
@@ -204,3 +201,22 @@ Darkside: with the BlackArch repository enabled, a ☠ shelf in the Store lists 
  ☠ Darkside · {} groups 	 ☠ Darkside · {} groupes 
 BlackArch tools · Enter opens a group	outils BlackArch · Entrée ouvre un groupe
 back	retour
+Flatpak · Chaotic-AUR · BlackArch…	Flatpak · Chaotic-AUR · BlackArch…
+{} enabled	{} activées
+Package sources ▸	Sources de logiciels ▸
+Package sources	Sources de logiciels
+ Package sources · Enter enables one · Esc back 	 Sources de logiciels · Entrée en active une · Échap revient 
+ Enter changes a setting or opens the sources 	 Entrée change un réglage ou ouvre les sources 
+change / open	changer / ouvrir
+enable	activer
+⚠ These are not reviewed by Arch Linux. A package from them can break an update or ship anything.	⚠ Arch Linux ne les relit pas. Un paquet venu de là peut casser une mise à jour ou contenir n'importe quoi.
+  Enable only what you understand, and read PKGBUILDs before building.	  N'activez que ce que vous comprenez et lisez les PKGBUILD avant de compiler.
+Extra places to install software from, each off by default. Enter opens the list; every one explains what it is and what it is good for before you turn it on.	Des endroits supplémentaires d'où installer des logiciels, tous désactivés par défaut. Entrée ouvre la liste ; chacun explique ce qu'il est et à quoi il sert avant que vous l'activiez.
+ is the handy one; 	 est la pratique ; 
+ is only for security work.	 ne sert qu'au travail de sécurité.
+The one most people want. Thousands of AUR programs already compiled by its maintainers, so browsers, editors, games and drivers install in seconds instead of building for minutes. Widely used and handy; still a third party, so a package could break an update.	Celle que presque tout le monde veut. Des milliers de programmes de l'AUR déjà compilés par ses mainteneurs : navigateurs, éditeurs, jeux et pilotes s'installent en secondes au lieu de compiler pendant des minutes. Très utilisée et pratique ; reste un tiers, un paquet pourrait donc casser une mise à jour.
+Flatpak with Flathub: desktop apps that run sandboxed, apart from the system, and update on their own. Good for closed-source or GUI apps you want kept separate from pacman. Built by their publishers, not by Arch.	Flatpak avec Flathub : des applis de bureau qui tournent en bac à sable, à part du système, et se mettent à jour seules. Bien pour les applis propriétaires ou graphiques à garder séparées de pacman. Faites par leurs éditeurs, pas par Arch.
+Canonical's take on the same idea, from the AUR. On Arch it has fewer apps than Flatpak and is heavier; enable it only if a program you need ships as a snap and nothing else.	La version de Canonical de la même idée, depuis l'AUR. Sur Arch elle a moins d'applis que Flatpak et est plus lourde ; activez-la seulement si un programme dont vous avez besoin n'existe qu'en snap.
+A desktop-tuned kernel (linux-lqx) for smoother audio, gaming and video when the machine is busy. Nice on a workstation, but you must add it to your bootloader after installing. A third-party kernel.	Un noyau réglé pour le bureau (linux-lqx), pour un audio, un jeu et une vidéo plus fluides quand la machine est chargée. Bien sur une station de travail, mais après l'installation il faut l'ajouter au chargeur d'amorçage. Un noyau tiers.
+Arch's own packages rebuilt for newer CPUs (x86-64-v3 or v4) for a small speed gain. Helps only on a 2015-or-later CPU and is safe to skip. Community project; its packages lag Arch by a few hours.	Les paquets d'Arch eux-mêmes recompilés pour les CPU récents (x86-64-v3 ou v4) pour un petit gain de vitesse. N'aide que sur un CPU de 2015 ou plus récent et peut être ignoré sans risque. Projet communautaire ; ses paquets ont quelques heures de retard sur Arch.
+Adds 2 800+ security and penetration-testing tools: scanners, exploits, forensics, wireless. It is meant for security work, the tools are dual-use, and the repository is large. If you are not sure you want it, you do not need it. Once enabled, the ☠ Darkside shelf in the Store lists these tools by group.	Ajoute plus de 2 800 outils de sécurité et de test d'intrusion : scanners, exploits, forensique, sans-fil. C'est pour le travail de sécurité, les outils sont à double usage et le dépôt est énorme. Si vous n'êtes pas sûr de le vouloir, vous n'en avez pas besoin. Une fois activé, le rayon ☠ Darkside de la Boutique liste ces outils par groupe.

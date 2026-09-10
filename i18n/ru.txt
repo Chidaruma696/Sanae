@@ -62,8 +62,8 @@ groups     	группы
 files      	файлы      
 environment	окружение  
 commands   	команды    
-\nAlready applied. Enter applies it again (safe).	\nУже применён. Enter применит снова (безопасно).
-\nNot applied yet.	\nЕщё не применён.
+Already applied. Enter applies it again (safe).	Уже применён. Enter применит снова (безопасно).
+Not applied yet.	Ещё не применён.
  What it does 	 Что делает 
 Nothing selected.	Ничего не выбрано.
  Details 	 Подробности 
@@ -145,10 +145,8 @@ The program that builds AUR packages for you: paru or yay. Auto picks whichever 
 How Sanae becomes root to run pacman: sudo or doas. Auto picks whichever is installed.	Как Sanae получает права root для запуска pacman: sudo или doas. «Авто» выбирает установленный.
 Use Nerd Font glyphs for the marks in lists. Only if your terminal font has them.	Использовать глифы Nerd Font для значков в списках. Только если они есть в шрифте терминала.
 The language of this interface. Auto follows the system language.	Язык этого интерфейса. «Авто» следует языку системы.
-\nAlready enabled.	\nУже включён.
-\nNot enabled. Enter enables it.	\nНе включён. Enter включит.
-⚠ Third-party repositories, the AUR, Flatpak and Snap are not reviewed by Arch Linux.	⚠ Сторонние репозитории, AUR, Flatpak и Snap не проверяются Arch Linux.
-  A package from them can break an update or ship anything. Enable only what you understand, and read PKGBUILDs before building.	  Пакет оттуда может сломать обновление или содержать что угодно. Включайте только то, что понимаете, и читайте PKGBUILD перед сборкой.
+Already enabled.	Уже включён.
+Not enabled. Enter enables it.	Не включён. Enter включит.
 Sanae and Reimu are made by Chidaruma. Do you like them? Visit github.com/Chidaruma696 and leave a star.	Sanae и Reimu созданы Chidaruma. Понравилось? Загляните на github.com/Chidaruma696 и поставьте звезду.
  About 	 О программе 
  step {}/{} 	 шаг {}/{} 
@@ -168,7 +166,6 @@ update everything (repos, then AUR)	обновить всё (репозитор�
 details: Info · Dependencies · Files · PKGBUILD	подробности: Инфо · Зависимости · Файлы · PKGBUILD
 Installed: filter · queue all orphans	Установлено: фильтр · все сироты в очередь
 reload the package databases	перечитать базы пакетов
-Settings: self-update, AUR helper, Flatpak, Snap, extra repositories	Настройки: самообновление, AUR-помощник, Flatpak, Snap, дополнительные репозитории
 While a command runs, keys go to it (sudo asks there). Ctrl+C cancels.	Пока выполняется команда, клавиши идут ей (sudo спрашивает там). Ctrl+C — отмена.
 {} packages known · config: {}	известно пакетов: {} · конфигурация: {}
  Keys · any key closes 	 Клавиши · любая клавиша закрывает 
@@ -204,3 +201,22 @@ Darkside: with the BlackArch repository enabled, a ☠ shelf in the Store lists 
  ☠ Darkside · {} groups 	 ☠ Darkside · {} групп 
 BlackArch tools · Enter opens a group	инструменты BlackArch · Enter открывает группу
 back	назад
+Flatpak · Chaotic-AUR · BlackArch…	Flatpak · Chaotic-AUR · BlackArch…
+{} enabled	включено: {}
+Package sources ▸	Источники программ ▸
+Package sources	Источники программ
+ Package sources · Enter enables one · Esc back 	 Источники программ · Enter включает одну · Esc — назад 
+ Enter changes a setting or opens the sources 	 Enter меняет настройку или открывает источники 
+change / open	изменить / открыть
+enable	включить
+⚠ These are not reviewed by Arch Linux. A package from them can break an update or ship anything.	⚠ Их не проверяет Arch Linux. Пакет оттуда может сломать обновление или содержать что угодно.
+  Enable only what you understand, and read PKGBUILDs before building.	  Включайте только то, что понимаете, и читайте PKGBUILD перед сборкой.
+Extra places to install software from, each off by default. Enter opens the list; every one explains what it is and what it is good for before you turn it on.	Дополнительные места, откуда ставить программы, все по умолчанию выключены. Enter открывает список; каждый объясняет, что это и чем полезен, прежде чем включить.
+ is the handy one; 	 — удобный; 
+ is only for security work.	 — только для задач безопасности.
+The one most people want. Thousands of AUR programs already compiled by its maintainers, so browsers, editors, games and drivers install in seconds instead of building for minutes. Widely used and handy; still a third party, so a package could break an update.	То, что нужно почти всем. Тысячи программ AUR, уже собранных сопровождающими: браузеры, редакторы, игры и драйверы ставятся за секунды вместо сборки. Широко используется и удобен; всё же третья сторона, так что пакет может сломать обновление.
+Flatpak with Flathub: desktop apps that run sandboxed, apart from the system, and update on their own. Good for closed-source or GUI apps you want kept separate from pacman. Built by their publishers, not by Arch.	Flatpak с Flathub: настольные приложения в песочнице, отдельно от системы, обновляются сами. Годится для закрытых или графических приложений, которые хочется держать отдельно от pacman. Собраны их издателями, не Arch.
+Canonical's take on the same idea, from the AUR. On Arch it has fewer apps than Flatpak and is heavier; enable it only if a program you need ships as a snap and nothing else.	Версия Canonical той же идеи, из AUR. На Arch приложений меньше, чем у Flatpak, и он тяжелее; включайте, только если нужная программа есть лишь как snap.
+A desktop-tuned kernel (linux-lqx) for smoother audio, gaming and video when the machine is busy. Nice on a workstation, but you must add it to your bootloader after installing. A third-party kernel.	Настроенное для десктопа ядро (linux-lqx): плавнее звук, игры и видео, когда машина загружена. Хорошо на рабочей станции, но после установки его нужно добавить в загрузчик. Стороннее ядро.
+Arch's own packages rebuilt for newer CPUs (x86-64-v3 or v4) for a small speed gain. Helps only on a 2015-or-later CPU and is safe to skip. Community project; its packages lag Arch by a few hours.	Собственные пакеты Arch, пересобранные под новые процессоры (x86-64-v3 или v4) ради небольшого прироста скорости. Помогает только на процессоре 2015 года и новее, можно спокойно пропустить. Проект сообщества; пакеты отстают от Arch на несколько часов.
+Adds 2 800+ security and penetration-testing tools: scanners, exploits, forensics, wireless. It is meant for security work, the tools are dual-use, and the repository is large. If you are not sure you want it, you do not need it. Once enabled, the ☠ Darkside shelf in the Store lists these tools by group.	Добавляет более 2 800 инструментов безопасности и тестирования на проникновение: сканеры, эксплойты, форензика, беспроводные сети. Он для задач безопасности, инструменты двойного назначения, а репозиторий огромен. Если не уверены, что он нужен, — он вам не нужен. После включения полка ☠ Darkside в Магазине показывает эти инструменты по группам.

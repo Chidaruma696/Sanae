@@ -62,8 +62,8 @@ groups     	グループ
 files      	ファイル   
 environment	環境変数   
 commands   	コマンド   
-\nAlready applied. Enter applies it again (safe).	\n適用済み。Enter で再適用（安全）。
-\nNot applied yet.	\n未適用。
+Already applied. Enter applies it again (safe).	適用済み。Enter で再適用（安全）。
+Not applied yet.	未適用。
  What it does 	 内容 
 Nothing selected.	何も選択されていません。
  Details 	 詳細 
@@ -145,10 +145,8 @@ The program that builds AUR packages for you: paru or yay. Auto picks whichever 
 How Sanae becomes root to run pacman: sudo or doas. Auto picks whichever is installed.	pacman を実行するために Sanae が root になる方法: sudo または doas。「自動」はインストール済みのものを使います。
 Use Nerd Font glyphs for the marks in lists. Only if your terminal font has them.	一覧の記号に Nerd Font のグリフを使います。端末のフォントが対応している場合のみ。
 The language of this interface. Auto follows the system language.	この画面の言語。「自動」はシステムの言語に従います。
-\nAlready enabled.	\n有効化済み。
-\nNot enabled. Enter enables it.	\n未有効。Enter で有効化。
-⚠ Third-party repositories, the AUR, Flatpak and Snap are not reviewed by Arch Linux.	⚠ サードパーティのリポジトリ、AUR、Flatpak、Snap は Arch Linux の審査を受けていません。
-  A package from them can break an update or ship anything. Enable only what you understand, and read PKGBUILDs before building.	  そこからのパッケージは更新を壊したり、何が入っているかわからなかったりします。理解しているものだけを有効にし、ビルド前に PKGBUILD を読んでください。
+Already enabled.	有効化済み。
+Not enabled. Enter enables it.	未有効。Enter で有効化。
 Sanae and Reimu are made by Chidaruma. Do you like them? Visit github.com/Chidaruma696 and leave a star.	Sanae と Reimu の作者は Chidaruma です。気に入ったら github.com/Chidaruma696 でスターをお願いします。
  About 	 情報 
  step {}/{} 	 手順 {}/{} 
@@ -168,7 +166,6 @@ update everything (repos, then AUR)	すべて更新（リポジトリ、次に A
 details: Info · Dependencies · Files · PKGBUILD	詳細: 情報 · 依存関係 · ファイル · PKGBUILD
 Installed: filter · queue all orphans	インストール済み: フィルター · 孤立をすべてキューへ
 reload the package databases	パッケージデータベースを再読み込み
-Settings: self-update, AUR helper, Flatpak, Snap, extra repositories	設定: 自己更新、AUR ヘルパー、Flatpak、Snap、追加リポジトリ
 While a command runs, keys go to it (sudo asks there). Ctrl+C cancels.	コマンド実行中はキー入力がそのコマンドに送られます（sudo はそこで尋ねます）。Ctrl+C で中止。
 {} packages known · config: {}	既知のパッケージ {} 個 · 設定: {}
  Keys · any key closes 	 キー操作 · 何かキーを押すと閉じる 
@@ -204,3 +201,22 @@ Darkside: with the BlackArch repository enabled, a ☠ shelf in the Store lists 
  ☠ Darkside · {} groups 	 ☠ Darkside · {} グループ 
 BlackArch tools · Enter opens a group	BlackArch のツール · Enter でグループを開く
 back	戻る
+Flatpak · Chaotic-AUR · BlackArch…	Flatpak · Chaotic-AUR · BlackArch…
+{} enabled	{} 個 有効
+Package sources ▸	ソフトウェアのソース ▸
+Package sources	ソフトウェアのソース
+ Package sources · Enter enables one · Esc back 	 ソフトウェアのソース · Enter で有効化 · Esc で戻る 
+ Enter changes a setting or opens the sources 	 Enter で設定を変更、またはソースを開く 
+change / open	変更 / 開く
+enable	有効化
+⚠ These are not reviewed by Arch Linux. A package from them can break an update or ship anything.	⚠ これらは Arch Linux の審査を受けていません。そこからのパッケージは更新を壊したり何でも含みえます。
+  Enable only what you understand, and read PKGBUILDs before building.	  理解しているものだけを有効にし、ビルド前に PKGBUILD を読んでください。
+Extra places to install software from, each off by default. Enter opens the list; every one explains what it is and what it is good for before you turn it on.	ソフトウェアを入れる追加の場所で、既定はすべてオフです。Enter で一覧を開き、有効にする前にそれぞれが何で何に役立つかを説明します。
+ is the handy one; 	 が便利、
+ is only for security work.	 はセキュリティ作業専用です。
+The one most people want. Thousands of AUR programs already compiled by its maintainers, so browsers, editors, games and drivers install in seconds instead of building for minutes. Widely used and handy; still a third party, so a package could break an update.	ほとんどの人が欲しがるもの。数千の AUR プログラムを管理者が既にコンパイル済みなので、ブラウザー、エディター、ゲーム、ドライバーが数分かけてビルドする代わりに数秒で入ります。広く使われて便利ですが第三者製なので、あるパッケージが更新を壊すこともあります。
+Flatpak with Flathub: desktop apps that run sandboxed, apart from the system, and update on their own. Good for closed-source or GUI apps you want kept separate from pacman. Built by their publishers, not by Arch.	Flatpak と Flathub：システムから隔離されて動き、自分で更新するデスクトップアプリ。pacman と分けておきたいクローズドソースや GUI アプリに向きます。作者が作っており、Arch ではありません。
+Canonical's take on the same idea, from the AUR. On Arch it has fewer apps than Flatpak and is heavier; enable it only if a program you need ships as a snap and nothing else.	同じ発想の Canonical 版で、AUR から入ります。Arch では Flatpak よりアプリが少なく重め。必要なプログラムが snap でしか配布されていないときだけ有効にしてください。
+A desktop-tuned kernel (linux-lqx) for smoother audio, gaming and video when the machine is busy. Nice on a workstation, but you must add it to your bootloader after installing. A third-party kernel.	デスクトップ向けに調整されたカーネル（linux-lqx）。負荷が高いときの音声、ゲーム、動画を滑らかにします。ワークステーションに向きますが、インストール後にブートローダーへ追加が必要です。第三者製カーネルです。
+Arch's own packages rebuilt for newer CPUs (x86-64-v3 or v4) for a small speed gain. Helps only on a 2015-or-later CPU and is safe to skip. Community project; its packages lag Arch by a few hours.	Arch 自身のパッケージを新しい CPU（x86-64-v3 または v4）向けに再ビルドし、わずかに高速化します。2015 年以降の CPU でしか効果がなく、飛ばしても問題ありません。コミュニティ企画で、パッケージは Arch より数時間遅れます。
+Adds 2 800+ security and penetration-testing tools: scanners, exploits, forensics, wireless. It is meant for security work, the tools are dual-use, and the repository is large. If you are not sure you want it, you do not need it. Once enabled, the ☠ Darkside shelf in the Store lists these tools by group.	セキュリティとペネトレーションテストのツールを 2,800 以上追加します：スキャナー、エクスプロイト、フォレンジック、無線。セキュリティ作業向けで、ツールはデュアルユース、リポジトリは巨大です。欲しいか自信がないなら必要ありません。有効にするとストアの ☠ Darkside 棚にこれらのツールがグループ別に並びます。
