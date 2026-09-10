@@ -1,0 +1,15 @@
+name = "ALHP (x86-64-v3 / v4 optimized packages)"
+summary = "Arch packages rebuilt for newer CPUs (x86-64-v3 or v4), picked according to what this CPU supports"
+category = "Sources"
+aur = ["alhp-keyring", "alhp-mirrorlist"]
+check = "grep -q 'x86-64-v[34]' /etc/pacman.conf"
+notes = "Community project (somegit.dev/ALHP). Packages usually lag Arch by a few hours; pacman falls back to the normal ones. If the CPU lacks v3 support nothing is enabled."
+
+[[commands]]
+run = """level=''
+if /lib/ld-linux-x86-64.so.2 --help | grep -q 'x86-64-v4 (supported'; then level=v4; elif /lib/ld-linux-x86-64.so.2 --help | grep -q 'x86-64-v3 (supported'; then level=v3; fi
+if [ -z "$level" ]; then echo 'This CPU does not support x86-64-v3; ALHP not enabled.'; exit 0; fi
+grep -q "x86-64-$level" /etc/pacman.conf && exit 0
+tmp=$(mktemp)
+awk -v lvl="$level" '/^\\[core\\]/ && !done { print "[core-x86-64-" lvl "]\\nInclude = /etc/pacman.d/alhp-mirrorlist\\n\\n[extra-x86-64-" lvl "]\\nInclude = /etc/pacman.d/alhp-mirrorlist\\n"; done=1 } { print }' /etc/pacman.conf > "$tmp" && cat "$tmp" > /etc/pacman.conf && rm -f "$tmp"
+pacman -Syuu --noconfirm"""

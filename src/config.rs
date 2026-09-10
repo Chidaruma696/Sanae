@@ -20,11 +20,13 @@ pub struct General {
     pub privilege: String,
     /// Ask before applying the queue.
     pub confirm: bool,
+    /// Look for a newer Sanae at start.
+    pub check_updates: bool,
 }
 
 impl Default for General {
     fn default() -> Self {
-        Self { aur_helper: "auto".into(), privilege: "auto".into(), confirm: true }
+        Self { aur_helper: "auto".into(), privilege: "auto".into(), confirm: true, check_updates: true }
     }
 }
 
@@ -59,6 +61,15 @@ impl Config {
             }),
             Err(_) => Self::default(),
         }
+    }
+
+    pub fn save(&self) -> std::io::Result<()> {
+        let Some(p) = Self::path() else { return Ok(()) };
+        if let Some(dir) = p.parent() {
+            std::fs::create_dir_all(dir)?;
+        }
+        let text = toml::to_string_pretty(self).map_err(std::io::Error::other)?;
+        std::fs::write(p, text)
     }
 
     /// The AUR helper to use, if any is installed.

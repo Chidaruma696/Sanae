@@ -1,0 +1,14 @@
+name = "Liquorix kernel repository"
+summary = "The Liquorix low-latency desktop kernel (linux-lqx) from its own repository"
+category = "Sources"
+check = "grep -q 'liquorix.net/archlinux' /etc/pacman.conf"
+notes = "Third-party kernel by Damentz. After enabling: pacman -S linux-lqx linux-lqx-headers, then add it to your bootloader (Reimu's systemd-boot entries need a copy for linux-lqx)."
+
+[[commands]]
+run = "pacman-key --keyserver hkps://keyserver.ubuntu.com --recv-keys 9AE4078033F8024D && pacman-key --lsign-key 9AE4078033F8024D"
+
+[[commands]]
+run = "grep -q 'liquorix.net/archlinux' /etc/pacman.conf || printf '\\n[liquorix]\\nServer = https://liquorix.net/archlinux/$repo/$arch\\n' >> /etc/pacman.conf"
+
+[[commands]]
+run = "pacman -Sy"

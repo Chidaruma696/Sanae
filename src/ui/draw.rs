@@ -19,12 +19,13 @@ pub fn draw(f: &mut Frame, app: &mut App) {
     }
     let rows = Layout::default()
         .direction(Direction::Vertical)
-        .constraints([Constraint::Length(1), Constraint::Min(8), Constraint::Length(1)])
+        .constraints([Constraint::Length(1), Constraint::Min(8), Constraint::Length(1), Constraint::Length(1)])
         .split(area);
     draw_tabs(f, app, rows[0]);
     let main = rows[1];
     match app.tab {
         Tab::Recipes => draw_recipes(f, app, main),
+        Tab::Settings => draw_settings(f, app, main),
         Tab::Queue => draw_queue(f, app, main),
         _ => {
             let parts = Layout::default()
@@ -42,6 +43,7 @@ pub fn draw(f: &mut Frame, app: &mut App) {
         }
     }
     draw_status(f, app, rows[2]);
+    draw_keys(f, app, rows[3]);
     if app.show_help {
         draw_help(f, app, area);
     }
@@ -390,8 +392,8 @@ fn draw_recipes(f: &mut Frame, app: &App, area: Rect) {
         .direction(Direction::Horizontal)
         .constraints([Constraint::Percentage(45), Constraint::Percentage(55)])
         .split(area);
-    let items: Vec<ListItem> = app
-        .recipes
+    let recipes = app.software_recipes();
+    let items: Vec<ListItem> = recipes
         .iter()
         .map(|r| {
             let (mark, style) = match app.recipe_status.get(&r.id) {
@@ -412,11 +414,11 @@ fn draw_recipes(f: &mut Frame, app: &App, area: Rect) {
     ]);
     let list =
         List::new(items).block(block(app, title, true)).highlight_style(app.theme.highlight()).highlight_symbol("▸ ");
-    let mut st = ListState::default().with_selected(if app.recipes.is_empty() { None } else { Some(app.recipe_sel) });
+    let mut st = ListState::default().with_selected(if recipes.is_empty() { None } else { Some(app.recipe_sel) });
     f.render_stateful_widget(list, cols[0], &mut st);
 
     let mut lines: Vec<Line> = Vec::new();
-    if let Some(r) = app.recipes.get(app.recipe_sel) {
+    if let Some(r) = recipes.get(app.recipe_sel) {
         lines.push(Line::from(Span::styled(r.name.clone(), app.theme.title())));
         lines.push(Line::from(r.summary.clone()));
         lines.push(Line::from(""));
@@ -640,22 +642,170 @@ fn draw_details(f: &mut Frame, app: &mut App, area: Rect) {
 }
 
 fn draw_status(f: &mut Frame, app: &App, area: Rect) {
-    let keys = match app.tab {
-        Tab::Store => "←→ shelves/apps · space mark · i install now · Enter open",
-        Tab::Search => "/ type · space mark · d mark remove · i install now · Tab details",
-        Tab::Installed => "f filter · space/d mark remove · o queue orphans · Tab details",
-        Tab::Updates => "u update everything · Tab details",
-        Tab::Queue => "a apply · d drop · c clear",
-        Tab::Recipes => "Enter apply",
-    };
     let left = if let Some(b) = &app.busy {
         Span::styled(format!(" ⏳ {b}"), app.theme.warn())
     } else if !app.status.is_empty() {
         Span::styled(format!(" {}", app.status), app.theme.accent2())
     } else {
-        Span::styled(format!(" {keys}"), app.theme.dim())
+        Span::styled(" Made by Chidaruma · like it? star it at github.com/Chidaruma696", app.theme.dim())
     };
     f.render_widget(Paragraph::new(Line::from(left)), area);
+}
+
+/// The keys that matter on this tab, always visible.
+fn draw_keys(f: &mut Frame, app: &App, area: Rect) {
+    let keys: &[(&str, &str)] = match app.tab {
+        Tab::Store => &[
+            ("←→", "shelves/apps"),
+            ("↑↓", "move"),
+            ("space", "mark"),
+            ("i", "install now"),
+            ("Enter", "open"),
+            ("Tab", "details"),
+            ("a", "apply queue"),
+            ("?", "help"),
+            ("q", "quit"),
+        ],
+        Tab::Search => &[
+            ("/", "type"),
+            ("↑↓", "move"),
+            ("space", "mark"),
+            ("d", "mark remove"),
+            ("i", "install now"),
+            ("Tab", "details"),
+            ("a", "apply queue"),
+            ("?", "help"),
+            ("q", "quit"),
+        ],
+        Tab::Installed => &[
+            ("f", "filter"),
+            ("↑↓", "move"),
+            ("space/d", "mark remove"),
+            ("o", "queue orphans"),
+            ("Tab", "details"),
+            ("a", "apply queue"),
+            ("?", "help"),
+            ("q", "quit"),
+        ],
+        Tab::Updates => &[
+            ("u/Enter", "update everything"),
+            ("↑↓", "move"),
+            ("Tab", "details"),
+            ("r", "reload"),
+            ("?", "help"),
+            ("q", "quit"),
+        ],
+        Tab::Queue => {
+            &[("a/Enter", "apply"), ("d", "drop line"), ("c", "clear"), ("←→", "scroll"), ("?", "help"), ("q", "quit")]
+        }
+        Tab::Recipes => &[("↑↓", "move"), ("Enter", "apply recipe"), ("?", "help"), ("q", "quit")],
+        Tab::Settings => &[("↑↓", "move"), ("Enter", "toggle / apply"), ("?", "help"), ("q", "quit")],
+    };
+    let mut spans = Vec::new();
+    for (k, what) in keys {
+        spans.push(Span::styled(format!(" {k} "), app.theme.highlight()));
+        spans.push(Span::styled(format!(" {what}  "), app.theme.dim()));
+    }
+    f.render_widget(Paragraph::new(Line::from(spans)), area);
+}
+
+fn draw_settings(f: &mut Frame, app: &App, area: Rect) {
+    let cols = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([Constraint::Percentage(48), Constraint::Percentage(52)])
+        .split(area);
+    let rows = app.settings_rows();
+    let sources = app.source_recipes();
+    let mut items: Vec<ListItem> = Vec::new();
+    for (_, label, value) in &rows {
+        items.push(ListItem::new(Line::from(vec![
+            Span::raw(format!("{label:<34}")),
+            Span::styled(value.clone(), app.theme.accent()),
+        ])));
+    }
+    for r in &sources {
+        let (mark, style) = match app.recipe_status.get(&r.id) {
+            Some(true) => (app.theme.installed(), app.theme.ok()),
+            Some(false) => ("○", app.theme.dim()),
+            None => ("…", app.theme.dim()),
+        };
+        items.push(ListItem::new(Line::from(vec![Span::styled(format!("{mark} "), style), Span::raw(r.name.clone())])));
+    }
+    let title = Line::from(vec![
+        Span::styled(" Settings ", app.theme.title()),
+        Span::styled(" Enter toggles a setting or enables a source ", app.theme.dim()),
+    ]);
+    let list =
+        List::new(items).block(block(app, title, true)).highlight_style(app.theme.highlight()).highlight_symbol("▸ ");
+    let mut st = ListState::default().with_selected(Some(app.settings_sel));
+    f.render_stateful_widget(list, cols[0], &mut st);
+
+    let mut lines: Vec<Line> = Vec::new();
+    if app.settings_sel < rows.len() {
+        let (id, label, _) = &rows[app.settings_sel];
+        lines.push(Line::from(Span::styled(label.clone(), app.theme.title())));
+        lines.push(Line::from(""));
+        let text = match *id {
+            "check_updates" => {
+                "Once every few hours Sanae asks GitHub whether a newer release exists and tells you in the status line. Nothing is downloaded until you ask."
+            }
+            "self_update" => {
+                "Downloads the latest release binary and replaces this one (needs your password). Sanae is a single file, so this is the whole update."
+            }
+            "aur_helper" => {
+                "The program that builds AUR packages for you: paru or yay. Auto picks whichever is installed."
+            }
+            "privilege" => "How Sanae becomes root to run pacman: sudo or doas. Auto picks whichever is installed.",
+            "nerd_font" => "Use Nerd Font glyphs for the marks in lists. Only if your terminal font has them.",
+            _ => "",
+        };
+        lines.push(Line::from(text));
+    } else if let Some(r) = sources.get(app.settings_sel - rows.len()) {
+        lines.push(Line::from(Span::styled(r.name.clone(), app.theme.title())));
+        lines.push(Line::from(r.summary.clone()));
+        lines.push(Line::from(""));
+        if !r.packages.is_empty() {
+            lines.push(Line::from(vec![
+                Span::styled("packages   ", app.theme.accent()),
+                Span::raw(r.packages.join(" ")),
+            ]));
+        }
+        if !r.aur.is_empty() {
+            lines.push(Line::from(vec![Span::styled("aur        ", app.theme.warn()), Span::raw(r.aur.join(" "))]));
+        }
+        if !r.commands.is_empty() {
+            lines.push(Line::from(vec![
+                Span::styled("commands   ", app.theme.accent()),
+                Span::raw(r.commands.iter().map(|c| c.run.clone()).collect::<Vec<_>>().join(" ; ")),
+            ]));
+        }
+        if let Some(n) = &r.notes {
+            lines.push(Line::from(""));
+            lines.push(Line::from(Span::styled(n.clone(), app.theme.warn())));
+        }
+        match app.recipe_status.get(&r.id) {
+            Some(true) => lines.push(Line::from(Span::styled("\nAlready enabled.", app.theme.ok()))),
+            Some(false) => lines.push(Line::from(Span::styled("\nNot enabled. Enter enables it.", app.theme.dim()))),
+            None => {}
+        }
+    }
+    lines.push(Line::from(""));
+    lines.push(Line::from(Span::styled(
+        "⚠ Third-party repositories, the AUR, Flatpak and Snap are not reviewed by Arch Linux.",
+        app.theme.warn(),
+    )));
+    lines.push(Line::from(Span::styled("  A package from them can break an update or ship anything. Enable only what you understand, and read PKGBUILDs before building.", app.theme.warn())));
+    lines.push(Line::from(""));
+    lines.push(Line::from(Span::styled(
+        "Sanae and Reimu are made by Chidaruma. Do you like them? Visit github.com/Chidaruma696 and leave a star.",
+        app.theme.dim(),
+    )));
+    let p = Paragraph::new(Text::from(lines)).wrap(Wrap { trim: false }).block(block(
+        app,
+        Line::from(Span::styled(" About ", app.theme.title())),
+        false,
+    ));
+    f.render_widget(p, cols[1]);
 }
 
 fn draw_run(f: &mut Frame, app: &App, area: Rect) {
@@ -703,7 +853,10 @@ fn draw_help(f: &mut Frame, app: &App, area: Rect) {
     f.render_widget(Clear, popup);
     let k = |s: &str| Span::styled(format!("{s:<10}"), app.theme.key());
     let lines = vec![
-        Line::from(vec![k("1-6"), Span::raw("tabs: Store · Search · Installed · Updates · Queue · Recipes")]),
+        Line::from(vec![
+            k("1-7"),
+            Span::raw("tabs: Store · Search · Installed · Updates · Queue · Recipes · Settings"),
+        ]),
         Line::from(vec![k("/"), Span::raw("search (Esc or Enter leaves the input)")]),
         Line::from(vec![k("↑↓ j k"), Span::raw("move · PgUp/PgDn · g/G first/last")]),
         Line::from(vec![k("← →"), Span::raw("Store: shelves / apps · elsewhere: scroll details")]),
@@ -716,7 +869,9 @@ fn draw_help(f: &mut Frame, app: &App, area: Rect) {
         Line::from(vec![k("f / o"), Span::raw("Installed: filter · queue all orphans")]),
         Line::from(vec![k("r"), Span::raw("reload the package databases")]),
         Line::from(vec![k("q"), Span::raw("quit")]),
+        Line::from(vec![k("7"), Span::raw("Settings: self-update, AUR helper, Flatpak, Snap, extra repositories")]),
         Line::from(""),
+        Line::from(Span::styled("Made by Chidaruma · github.com/Chidaruma696", app.theme.accent())),
         Line::from(Span::styled(
             "While a command runs, keys go to it (sudo asks there). Ctrl+C cancels.",
             app.theme.dim(),

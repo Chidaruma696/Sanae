@@ -1,0 +1,10 @@
+name = "Snap (snapd)"
+summary = "Canonical's snapd from the AUR, with the socket enabled and /snap linked"
+category = "Sources"
+aur = ["snapd"]
+services = ["snapd.socket", "snapd.apparmor.service"]
+check = "pacman -Qq snapd >/dev/null 2>&1 && systemctl is-enabled snapd.socket >/dev/null 2>&1"
+notes = "Snaps are not supported by Arch; snapd comes from the AUR. Log out and back in after enabling. Classic snaps need /snap, which this creates."
+
+[[commands]]
+run = "[ -e /snap ] || ln -s /var/lib/snapd/snap /snap"
