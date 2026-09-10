@@ -156,7 +156,7 @@ Sanae and Reimu are made by Chidaruma. Do you like them? Visit github.com/Chidar
  ✖ failed · Enter or Esc to go back 	 ✖ ошибка · Enter или Esc — назад 
  ✔ done · Enter or Esc to go back 	 ✔ готово · Enter или Esc — назад 
  running · type here to answer prompts (sudo password) · Ctrl+C cancels 	 выполняется · вводите здесь ответы на запросы (пароль sudo) · Ctrl+C — отмена 
-tabs: Store · Search · Installed · Updates · Queue · Recipes · Settings	вкладки: Магазин · Поиск · Установлено · Обновления · Очередь · Рецепты · Настройки
+tabs: Store · Search · Installed · Updates · Queue · Recipes · Settings · Darkside	вкладки: Магазин · Поиск · Установлено · Обновления · Очередь · Рецепты · Настройки · Darkside
 search (Esc or Enter leaves the input)	поиск (Esc или Enter выходит из поля ввода)
 move · PgUp/PgDn · g/G first/last	перемещение · PgUp/PgDn · g/G — первый/последний
 Store: shelves / apps · elsewhere: scroll details	Магазин: полки / приложения · в других местах: прокрутка подробностей
@@ -194,3 +194,13 @@ Updating Sanae	Обновление Sanae
 Downloading the latest Sanae…	Загрузка последней версии Sanae…
 update: {}	обновление: {}
 ⬆ Sanae {} is out · 7 → Update Sanae now 	⬆ Вышел Sanae {} · 7 → Обновить Sanae сейчас 
+ Groups 	 Группы 
+ {} · {} tools 	 {} · {} инструментов 
+groups/tools	группы/инструменты
+queue the group	группу в очередь
+{} tools queued	инструментов в очереди: {}
+Purple team	Фиолетовая команда
+detection, forensics and hardening · from any repository	обнаружение, форензика и защита · из любого репозитория
+by popularity · A queues the whole group	по популярности · A ставит всю группу в очередь
+No BlackArch tools found. Press r to reload the databases.	Инструменты BlackArch не найдены. Нажмите r, чтобы перечитать базы.
+Darkside: BlackArch tools by group · appears once the BlackArch repository is enabled	Darkside: инструменты BlackArch по группам · появляется после включения репозитория BlackArch

@@ -156,7 +156,7 @@ Sanae and Reimu are made by Chidaruma. Do you like them? Visit github.com/Chidar
  ✖ failed · Enter or Esc to go back 	 ✖ échec · Entrée ou Échap pour revenir 
  ✔ done · Enter or Esc to go back 	 ✔ terminé · Entrée ou Échap pour revenir 
  running · type here to answer prompts (sudo password) · Ctrl+C cancels 	 en cours · tapez ici pour répondre aux invites (mot de passe sudo) · Ctrl+C annule 
-tabs: Store · Search · Installed · Updates · Queue · Recipes · Settings	onglets : Boutique · Recherche · Installés · Mises à jour · File · Recettes · Réglages
+tabs: Store · Search · Installed · Updates · Queue · Recipes · Settings · Darkside	onglets : Boutique · Recherche · Installés · Mises à jour · File · Recettes · Réglages · Darkside
 search (Esc or Enter leaves the input)	rechercher (Échap ou Entrée quitte le champ)
 move · PgUp/PgDn · g/G first/last	déplacer · PgPréc/PgSuiv · g/G premier/dernier
 Store: shelves / apps · elsewhere: scroll details	Boutique : rayons / apps · ailleurs : faire défiler les détails
@@ -194,3 +194,13 @@ Updating Sanae	Mise à jour de Sanae
 Downloading the latest Sanae…	Téléchargement du dernier Sanae…
 update: {}	mise à jour : {}
 ⬆ Sanae {} is out · 7 → Update Sanae now 	⬆ Sanae {} est sorti · 7 → Mettre à jour Sanae maintenant 
+ Groups 	 Groupes 
+ {} · {} tools 	 {} · {} outils 
+groups/tools	groupes/outils
+queue the group	mettre le groupe en file
+{} tools queued	{} outils en file
+Purple team	Équipe violette
+detection, forensics and hardening · from any repository	détection, forensique et durcissement · de n'importe quel dépôt
+by popularity · A queues the whole group	par popularité · A met tout le groupe en file
+No BlackArch tools found. Press r to reload the databases.	Aucun outil BlackArch trouvé. Appuyez sur r pour recharger les bases.
+Darkside: BlackArch tools by group · appears once the BlackArch repository is enabled	Darkside : outils BlackArch par groupe · apparaît une fois le dépôt BlackArch activé
