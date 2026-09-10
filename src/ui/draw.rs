@@ -982,26 +982,55 @@ fn draw_run(f: &mut Frame, app: &App, area: Rect) {
     ]);
     f.render_widget(Paragraph::new(head).block(block(app, Line::from(""), true)), rows[0]);
     let inner_h = usize::from(rows[1].height.saturating_sub(2));
-    let mut shown: Vec<Line> =
-        run.lines.iter().rev().take(inner_h.saturating_sub(1)).map(|l| Line::from(l.clone())).collect::<Vec<_>>();
-    shown.reverse();
+    let inner_w = usize::from(rows[1].width.saturating_sub(2)).max(10);
+    // Wrap by hand so the window really ends at the newest line (or at the scroll position).
+    let wrap = |s: &str| -> Vec<String> {
+        let chars: Vec<char> = s.chars().collect();
+        if chars.is_empty() {
+            return vec![String::new()];
+        }
+        chars.chunks(inner_w).map(|c| c.iter().collect()).collect()
+    };
+    let mut rows_out: Vec<(String, bool)> =
+        run.lines.iter().flat_map(|l| wrap(l).into_iter().map(|r| (r, false))).collect();
     if !run.partial.is_empty() {
-        shown.push(Line::from(Span::styled(run.partial.clone(), app.theme.accent())));
+        rows_out.extend(wrap(&run.partial).into_iter().map(|r| (r, true)));
     }
-    let p = Paragraph::new(Text::from(shown)).wrap(Wrap { trim: false }).block(block(
+    let total = rows_out.len();
+    let end = total.saturating_sub(run.scroll.min(total.saturating_sub(inner_h)));
+    let start = end.saturating_sub(inner_h);
+    let shown: Vec<Line> = rows_out[start..end]
+        .iter()
+        .map(
+            |(r, partial)| {
+                if *partial { Line::from(Span::styled(r.clone(), app.theme.accent())) } else { Line::from(r.clone()) }
+            },
+        )
+        .collect();
+    let above = if start > 0 { tfmt!(" ↑ {} more · PgUp/PgDn scroll ", start) } else { String::new() };
+    let p = Paragraph::new(Text::from(shown)).block(block(
         app,
-        Line::from(Span::styled(t(" output "), app.theme.dim())),
+        Line::from(vec![Span::styled(t(" output "), app.theme.dim()), Span::styled(above, app.theme.dim())]),
         false,
     ));
     f.render_widget(p, rows[1]);
+    let log = tfmt!(" · full log: {}", app.run_log_path().display());
     let foot = if run.finished {
         if run.failed {
-            Span::styled(t(" ✖ failed · Enter or Esc to go back "), app.theme.bad())
+            Span::styled(format!("{}{log}", t(" ✖ failed · Enter or Esc to go back · ↑↓ scroll")), app.theme.bad())
+        } else if run.restart_after {
+            Span::styled(
+                t(" ✔ updated · Enter restarts Sanae with the new version · Esc keeps this one "),
+                app.theme.ok(),
+            )
         } else {
-            Span::styled(t(" ✔ done · Enter or Esc to go back "), app.theme.ok())
+            Span::styled(format!("{}{log}", t(" ✔ done · Enter or Esc to go back · ↑↓ scroll")), app.theme.ok())
         }
     } else {
-        Span::styled(t(" running · type here to answer prompts (sudo password) · Ctrl+C cancels "), app.theme.dim())
+        Span::styled(
+            t(" running · type here to answer prompts (sudo password) · PgUp/PgDn scroll · Ctrl+C cancels "),
+            app.theme.dim(),
+        )
     };
     f.render_widget(Paragraph::new(Line::from(foot)), rows[2]);
 }

@@ -46,6 +46,9 @@ impl Runner {
         thread::spawn(move || {
             let mut buf = [0u8; 4096];
             let mut line = String::new();
+            // A '\r' was seen: the next char either ends the line ("\r\n", what a
+            // pty writes for every newline) or redraws it (a progress bar).
+            let mut cr = false;
             let mut pending = Vec::new();
             loop {
                 let n = match reader.read(&mut buf) {
@@ -68,17 +71,24 @@ impl Runner {
                 for ch in strip_ansi(&text).chars() {
                     match ch {
                         '\n' => {
+                            cr = false;
                             let _ = tx_out.send(ExecEvent::Line(std::mem::take(&mut line)));
                         }
                         '\r' => {
-                            // Carriage return: the line is about to be redrawn.
+                            cr = true;
                             if !line.is_empty() {
                                 let _ = tx_out.send(ExecEvent::Partial(line.clone()));
                             }
-                            line.clear();
                         }
                         c if c.is_control() && c != '\t' => {}
-                        c => line.push(c),
+                        c => {
+                            if cr {
+                                // A redraw, not a line end: start the line over.
+                                line.clear();
+                                cr = false;
+                            }
+                            line.push(c);
+                        }
                     }
                 }
                 if !line.is_empty() {

@@ -163,6 +163,10 @@ pub struct RunState {
     pub finished: bool,
     pub failed: bool,
     pub title: String,
+    /// Lines scrolled up from the bottom of the output.
+    pub scroll: usize,
+    /// A Sanae update: offer to restart into the new binary when it is done.
+    pub restart_after: bool,
     exec_rx: Option<std_mpsc::Receiver<ExecEvent>>,
 }
 
@@ -226,6 +230,8 @@ pub struct App {
     pub status: String,
     pub busy: Option<String>,
     pub should_quit: bool,
+    /// Quit and start the (new) binary again.
+    pub restart: bool,
     pub size: (u16, u16),
     tx: mpsc::UnboundedSender<Msg>,
     http: reqwest::Client,
@@ -291,6 +297,7 @@ pub async fn run(cfg: Config, cache: Cache) -> Result<()> {
         status: String::new(),
         busy: None,
         should_quit: false,
+        restart: false,
         size: (80, 24),
         tx: tx.clone(),
         http,
@@ -338,7 +345,25 @@ pub async fn run(cfg: Config, cache: Cache) -> Result<()> {
     let mut terminal = ratatui::init();
     let result = main_loop(&mut terminal, &mut app, &mut rx).await;
     ratatui::restore();
+    if app.restart && result.is_ok() {
+        restart_self();
+    }
     result
+}
+
+/// Replace this process with the binary on disk (the one the update just installed).
+fn restart_self() {
+    let exe = std::env::current_exe().unwrap_or_else(|_| "/usr/local/bin/sanae".into());
+    #[cfg(unix)]
+    {
+        use std::os::unix::process::CommandExt;
+        let err = std::process::Command::new(&exe).exec();
+        eprintln!("could not restart {}: {err}", exe.display());
+    }
+    #[cfg(not(unix))]
+    {
+        let _ = std::process::Command::new(&exe).spawn();
+    }
 }
 
 async fn main_loop(
@@ -487,7 +512,7 @@ impl App {
                         self.busy = None;
                         let steps =
                             crate::selfupdate::wget_steps(&self.cfg.privilege(), &dir, &crate::selfupdate::target());
-                        self.start_run(t("Updating Sanae"), steps);
+                        self.start_update_run(steps);
                         return;
                     }
                     let tx = self.tx.clone();
@@ -972,9 +997,19 @@ impl App {
             finished: false,
             failed: false,
             title: title.to_string(),
+            scroll: 0,
+            restart_after: false,
             exec_rx: None,
         });
         self.spawn_current_step();
+    }
+
+    /// Start a run that replaces this binary; when it succeeds, Enter restarts Sanae.
+    fn start_update_run(&mut self, steps: Vec<Step>) {
+        self.start_run(t("Updating Sanae"), steps);
+        if let Some(run) = self.run.as_mut() {
+            run.restart_after = true;
+        }
     }
 
     fn spawn_current_step(&mut self) {
@@ -1008,10 +1043,12 @@ impl App {
     }
 
     fn on_exec(&mut self, ev: ExecEvent) {
+        let log_path = self.run_log_path();
         let Some(run) = self.run.as_mut() else { return };
         match ev {
             ExecEvent::Line(l) => {
                 run.partial.clear();
+                run.scroll = 0;
                 run.lines.push_back(l);
                 while run.lines.len() > 2000 {
                     run.lines.pop_front();
@@ -1032,7 +1069,28 @@ impl App {
                     run.lines.push_back("✔ done".into());
                     run.finished = true;
                 }
+                if run.finished {
+                    let text: String = run.lines.iter().map(|l| format!("{l}\n")).collect();
+                    let _ = std::fs::write(log_path, text);
+                }
             }
+        }
+    }
+
+    /// Where the last run's full output is saved.
+    pub fn run_log_path(&self) -> std::path::PathBuf {
+        let dir = self.cache.dir();
+        if dir.as_os_str().is_empty() {
+            std::env::temp_dir().join("sanae-last-run.log")
+        } else {
+            dir.join("last-run.log")
+        }
+    }
+
+    fn scroll_run(&mut self, delta: i64) {
+        if let Some(run) = self.run.as_mut() {
+            let max = run.lines.len().saturating_sub(1) as i64;
+            run.scroll = (run.scroll as i64).saturating_add(delta).clamp(0, max) as usize;
         }
     }
 
@@ -1157,7 +1215,7 @@ impl App {
                 self.busy = None;
                 let steps =
                     crate::selfupdate::install_steps(&self.cfg.privilege(), &path, &crate::selfupdate::target());
-                self.start_run(t("Updating Sanae"), steps);
+                self.start_update_run(steps);
             }
             Msg::NewRelease(tag) => {
                 self.status = tfmt!("Sanae {} is out: Settings (7) → Update Sanae now", tag);
@@ -1332,10 +1390,26 @@ impl App {
     }
 
     fn on_key_run(&mut self, k: KeyEvent) {
-        let finished = self.run.as_ref().is_some_and(|r| r.finished);
+        let (finished, failed, restart) =
+            self.run.as_ref().map(|r| (r.finished, r.failed, r.restart_after)).unwrap_or_default();
+        let page = usize::from(self.size.1.saturating_sub(6)).max(1);
+        match k.code {
+            KeyCode::PageUp => return self.scroll_run(page as i64),
+            KeyCode::PageDown => return self.scroll_run(-(page as i64)),
+            KeyCode::Up if finished => return self.scroll_run(1),
+            KeyCode::Down if finished => return self.scroll_run(-1),
+            KeyCode::Home if finished => return self.scroll_run(i64::MAX / 2),
+            KeyCode::End if finished => return self.scroll_run(i64::MIN / 2),
+            _ => {}
+        }
         if finished {
-            if matches!(k.code, KeyCode::Esc | KeyCode::Enter | KeyCode::Char('q')) {
-                self.close_run();
+            match k.code {
+                KeyCode::Enter if restart && !failed => {
+                    self.restart = true;
+                    self.should_quit = true;
+                }
+                KeyCode::Esc | KeyCode::Enter | KeyCode::Char('q') => self.close_run(),
+                _ => {}
             }
             return;
         }

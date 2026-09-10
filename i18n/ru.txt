@@ -151,9 +151,9 @@ Sanae and Reimu are made by Chidaruma. Do you like them? Visit github.com/Chidar
  About 	 О программе 
  step {}/{} 	 шаг {}/{} 
  output 	 вывод 
- ✖ failed · Enter or Esc to go back 	 ✖ ошибка · Enter или Esc — назад 
- ✔ done · Enter or Esc to go back 	 ✔ готово · Enter или Esc — назад 
- running · type here to answer prompts (sudo password) · Ctrl+C cancels 	 выполняется · вводите здесь ответы на запросы (пароль sudo) · Ctrl+C — отмена 
+ ✖ failed · Enter or Esc to go back · ↑↓ scroll	 ✖ ошибка · Enter или Esc — назад · ↑↓ прокрутка
+ ✔ done · Enter or Esc to go back · ↑↓ scroll	 ✔ готово · Enter или Esc — назад · ↑↓ прокрутка
+ running · type here to answer prompts (sudo password) · PgUp/PgDn scroll · Ctrl+C cancels 	 выполняется · вводите здесь ответы на запросы (пароль sudo) · PgUp/PgDn прокрутка · Ctrl+C — отмена 
 tabs: Store · Search · Installed · Updates · Queue · Recipes · Settings	вкладки: Магазин · Поиск · Установлено · Обновления · Очередь · Рецепты · Настройки · Darkside
 search (Esc or Enter leaves the input)	поиск (Esc или Enter выходит из поля ввода)
 move · PgUp/PgDn · g/G first/last	перемещение · PgUp/PgDn · g/G — первый/последний
@@ -220,3 +220,6 @@ Canonical's take on the same idea, from the AUR. On Arch it has fewer apps than 
 A desktop-tuned kernel (linux-lqx) for smoother audio, gaming and video when the machine is busy. Nice on a workstation, but you must add it to your bootloader after installing. A third-party kernel.	Настроенное для десктопа ядро (linux-lqx): плавнее звук, игры и видео, когда машина загружена. Хорошо на рабочей станции, но после установки его нужно добавить в загрузчик. Стороннее ядро.
 Arch's own packages rebuilt for newer CPUs (x86-64-v3 or v4) for a small speed gain. Helps only on a 2015-or-later CPU and is safe to skip. Community project; its packages lag Arch by a few hours.	Собственные пакеты Arch, пересобранные под новые процессоры (x86-64-v3 или v4) ради небольшого прироста скорости. Помогает только на процессоре 2015 года и новее, можно спокойно пропустить. Проект сообщества; пакеты отстают от Arch на несколько часов.
 Adds 2 800+ security and penetration-testing tools: scanners, exploits, forensics, wireless. It is meant for security work, the tools are dual-use, and the repository is large. If you are not sure you want it, you do not need it. Once enabled, the ☠ Darkside shelf in the Store lists these tools by group.	Добавляет более 2 800 инструментов безопасности и тестирования на проникновение: сканеры, эксплойты, форензика, беспроводные сети. Он для задач безопасности, инструменты двойного назначения, а репозиторий огромен. Если не уверены, что он нужен, — он вам не нужен. После включения полка ☠ Darkside в Магазине показывает эти инструменты по группам.
+ ↑ {} more · PgUp/PgDn scroll 	 ↑ ещё {} · PgUp/PgDn прокрутка 
+ · full log: {}	 · полный журнал: {}
+ ✔ updated · Enter restarts Sanae with the new version · Esc keeps this one 	 ✔ обновлено · Enter перезапустит Sanae с новой версией · Esc оставит эту 
