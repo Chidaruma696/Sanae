@@ -156,7 +156,7 @@ Sanae and Reimu are made by Chidaruma. Do you like them? Visit github.com/Chidar
  ✖ failed · Enter or Esc to go back 	 ✖ 失敗 · Enter または Esc で戻る 
  ✔ done · Enter or Esc to go back 	 ✔ 完了 · Enter または Esc で戻る 
  running · type here to answer prompts (sudo password) · Ctrl+C cancels 	 実行中 · ここに入力して応答（sudo のパスワード）· Ctrl+C で中止 
-tabs: Store · Search · Installed · Updates · Queue · Recipes · Settings	タブ: ストア · 検索 · インストール済み · 更新 · キュー · レシピ · 設定
+tabs: Store · Search · Installed · Updates · Queue · Recipes · Settings · Darkside	タブ: ストア · 検索 · インストール済み · 更新 · キュー · レシピ · 設定 · Darkside
 search (Esc or Enter leaves the input)	検索（Esc または Enter で入力欄を抜ける）
 move · PgUp/PgDn · g/G first/last	移動 · PgUp/PgDn · g/G 先頭/末尾
 Store: shelves / apps · elsewhere: scroll details	ストア: 棚 / アプリ · その他: 詳細をスクロール
@@ -194,3 +194,13 @@ Updating Sanae	Sanae を更新中
 Downloading the latest Sanae…	最新の Sanae をダウンロード中…
 update: {}	更新: {}
 ⬆ Sanae {} is out · 7 → Update Sanae now 	⬆ Sanae {} が公開 · 7 → 今すぐ Sanae を更新 
+ Groups 	 グループ 
+ {} · {} tools 	 {} · {} 個のツール 
+groups/tools	グループ/ツール
+queue the group	グループをキューへ
+{} tools queued	ツール {} 個をキューに追加
+Purple team	パープルチーム
+detection, forensics and hardening · from any repository	検知、フォレンジック、堅牢化 · あらゆるリポジトリから
+by popularity · A queues the whole group	人気順 · A でグループ全体をキューへ
+No BlackArch tools found. Press r to reload the databases.	BlackArch のツールが見つかりません。r を押してデータベースを再読み込みしてください。
+Darkside: BlackArch tools by group · appears once the BlackArch repository is enabled	Darkside: BlackArch のツールをグループ別に表示 · BlackArch リポジトリを有効にすると現れます

@@ -38,6 +38,7 @@ pub fn draw(f: &mut Frame, app: &mut App) {
                 Tab::Search => draw_search(f, app, parts[0]),
                 Tab::Installed => draw_installed(f, app, parts[0]),
                 Tab::Updates => draw_updates(f, app, parts[0]),
+                Tab::Darkside => draw_darkside(f, app, parts[0]),
                 _ => {}
             }
             draw_details(f, app, parts[1]);
@@ -59,7 +60,8 @@ fn block<'a>(app: &App, title: impl Into<Line<'a>>, focused: bool) -> Block<'a> 
 }
 
 fn draw_tabs(f: &mut Frame, app: &App, area: Rect) {
-    let titles: Vec<Line> = Tab::ALL
+    let visible = app.tabs();
+    let titles: Vec<Line> = visible
         .iter()
         .enumerate()
         .map(|(i, t)| {
@@ -72,15 +74,16 @@ fn draw_tabs(f: &mut Frame, app: &App, area: Rect) {
                 Tab::Queue if !app.queue.is_empty() => format!(" ({})", app.queue.len()),
                 _ => String::new(),
             };
-            Line::from(vec![
-                Span::styled(format!("{}", i + 1), app.theme.key()),
-                Span::raw(format!(" {}{extra}", t.title())),
-            ])
+            let name = match t {
+                Tab::Darkside => Span::styled(format!(" {}{extra}", t.title()), app.theme.warn()),
+                _ => Span::raw(format!(" {}{extra}", t.title())),
+            };
+            Line::from(vec![Span::styled(format!("{}", i + 1), app.theme.key()), name])
         })
         .collect();
     let brand = Span::styled(" 早苗 Sanae ", app.theme.title());
     let tabs = Tabs::new(titles)
-        .select(app.tab.index())
+        .select(visible.iter().position(|t| *t == app.tab).unwrap_or(0))
         .highlight_style(app.theme.highlight())
         .divider(Span::styled(" · ", app.theme.dim()));
     let cols = Layout::default()
@@ -223,6 +226,54 @@ fn draw_store(f: &mut Frame, app: &App, area: Rect) {
         return;
     }
     draw_list(f, app, cols[1], &app.store_items, app.store_sel, title, !app.shelf_focus);
+}
+
+/// BlackArch tools by group: the pacman groups of the blackarch repository on
+/// the left, the tools of the selected one on the right.
+fn draw_darkside(f: &mut Frame, app: &App, area: Rect) {
+    let cols = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([Constraint::Length(26), Constraint::Min(20)])
+        .split(area);
+    let groups: Vec<ListItem> = app
+        .dark_groups
+        .iter()
+        .map(|(name, n)| {
+            let label = if name == super::PURPLE_GROUP { t("Purple team").to_string() } else { name.clone() };
+            ListItem::new(Line::from(vec![
+                Span::raw(format!("{label:<17}")),
+                Span::styled(format!("{n:>5}"), app.theme.dim()),
+            ]))
+        })
+        .collect();
+    let list = List::new(groups)
+        .block(block(app, Line::from(Span::styled(t(" Groups "), app.theme.title())), app.dark_focus))
+        .highlight_style(app.theme.highlight())
+        .highlight_symbol("▸ ");
+    let mut st = ListState::default().with_selected(Some(app.dark_group_sel));
+    f.render_stateful_widget(list, cols[0], &mut st);
+    let (group, purple) = match app.dark_groups.get(app.dark_group_sel) {
+        Some((g, _)) if g == super::PURPLE_GROUP => (t("Purple team").to_string(), true),
+        Some((g, _)) => (g.clone(), false),
+        None => (String::new(), false),
+    };
+    let sub = if purple {
+        t("detection, forensics and hardening · from any repository")
+    } else {
+        t("by popularity · A queues the whole group")
+    };
+    let title = Line::from(vec![
+        Span::styled(tfmt!(" {} · {} tools ", group, app.dark_items.len()), app.theme.title()),
+        Span::styled(format!(" {sub} "), app.theme.dim()),
+    ]);
+    if app.dark_items.is_empty() {
+        let p = Paragraph::new(t("No BlackArch tools found. Press r to reload the databases."))
+            .wrap(Wrap { trim: false })
+            .block(block(app, title, !app.dark_focus));
+        f.render_widget(p, cols[1]);
+        return;
+    }
+    draw_list(f, app, cols[1], &app.dark_items, app.dark_sel, title, !app.dark_focus);
 }
 
 fn draw_installed(f: &mut Frame, app: &App, area: Rect) {
@@ -717,6 +768,17 @@ fn draw_keys(f: &mut Frame, app: &App, area: Rect) {
             ("?", t("help")),
             ("q", t("quit")),
         ],
+        Tab::Darkside => &[
+            ("←→", t("groups/tools")),
+            ("↑↓", t("move")),
+            ("space", t("mark")),
+            ("A", t("queue the group")),
+            ("i", t("install now")),
+            ("Tab", t("details")),
+            ("a", t("apply queue")),
+            ("?", t("help")),
+            ("q", t("quit")),
+        ],
         Tab::Recipes => &[("↑↓", t("move")), ("Enter", t("apply recipe")), ("?", t("help")), ("q", t("quit"))],
         Tab::Settings => &[("↑↓", t("move")), ("Enter", t("toggle / apply")), ("?", t("help")), ("q", t("quit"))],
     };
@@ -868,14 +930,14 @@ fn draw_run(f: &mut Frame, app: &App, area: Rect) {
 
 fn draw_help(f: &mut Frame, app: &App, area: Rect) {
     let w = area.width.min(64);
-    let h = area.height.min(24);
+    let h = area.height.min(25);
     let popup = Rect { x: (area.width - w) / 2, y: (area.height - h) / 2, width: w, height: h };
     f.render_widget(Clear, popup);
     let k = |s: &str| Span::styled(format!("{s:<10}"), app.theme.key());
     let lines = vec![
         Line::from(vec![
-            k("1-7"),
-            Span::raw(t("tabs: Store · Search · Installed · Updates · Queue · Recipes · Settings")),
+            k("1-8"),
+            Span::raw(t("tabs: Store · Search · Installed · Updates · Queue · Recipes · Settings · Darkside")),
         ]),
         Line::from(vec![k("/"), Span::raw(t("search (Esc or Enter leaves the input)"))]),
         Line::from(vec![k("↑↓ j k"), Span::raw(t("move · PgUp/PgDn · g/G first/last"))]),
@@ -890,6 +952,10 @@ fn draw_help(f: &mut Frame, app: &App, area: Rect) {
         Line::from(vec![k("r"), Span::raw(t("reload the package databases"))]),
         Line::from(vec![k("q"), Span::raw(t("quit"))]),
         Line::from(vec![k("7"), Span::raw(t("Settings: self-update, AUR helper, Flatpak, Snap, extra repositories"))]),
+        Line::from(vec![
+            k("8"),
+            Span::raw(t("Darkside: BlackArch tools by group · appears once the BlackArch repository is enabled")),
+        ]),
         Line::from(""),
         Line::from(Span::styled(t("Made by Chidaruma · github.com/Chidaruma696"), app.theme.accent())),
         Line::from(Span::styled(

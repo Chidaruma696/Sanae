@@ -2,7 +2,7 @@ name = "BlackArch repository"
 summary = "The BlackArch penetration-testing repository (2 800+ security tools) on top of Arch"
 category = "Sources"
 check = "grep -q '^\\[blackarch\\]' /etc/pacman.conf"
-notes = "Runs BlackArch's official strap.sh as root. Security tooling is dual-use; the repository is large. Enable it only if you know why you want it."
+notes = "Runs BlackArch's official strap.sh as root. Once enabled, the Darkside tab (8) lists its tools by group. Security tooling is dual-use; the repository is large. Enable it only if you know why you want it."
 
 [[commands]]
 run = "curl -fsSL https://blackarch.org/strap.sh -o /tmp/strap.sh && chmod +x /tmp/strap.sh && /tmp/strap.sh && rm -f /tmp/strap.sh"
