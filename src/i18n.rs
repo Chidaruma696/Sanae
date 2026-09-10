@@ -25,7 +25,7 @@ fn parse(text: &'static str) -> HashMap<&'static str, &'static str> {
     text.lines()
         .filter(|l| !l.starts_with('#'))
         .filter_map(|l| l.split_once('\t'))
-        .map(|(k, v)| (k, v.trim_end_matches('')))
+        .map(|(k, v)| (k, v.trim_end_matches('\r')))
         .filter(|(_, v)| !v.is_empty())
         .collect()
 }
