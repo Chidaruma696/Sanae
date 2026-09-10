@@ -1,9 +1,9 @@
 //! Is there a newer Sanae? Asked at start and updated on request.
 //!
-//! The download happens inside Sanae (reqwest, with retries), not through curl
-//! under sudo: curl there inherits neither the proxy environment nor a sane
-//! retry policy, and on flaky links (VirtualBox NAT, some ISPs) it dies with
-//! exit 56 halfway through the binary. The privilege tool only runs `install`.
+//! The download goes through wget when it is installed (it resumes and retries
+//! on its own; curl dies with exit 56 halfway through on flaky links such as
+//! VirtualBox NAT), and through Sanae's own HTTP client with retries otherwise.
+//! Never through curl. The privilege tool only runs `install`.
 
 use std::path::{Path, PathBuf};
 use std::time::Duration;
@@ -52,9 +52,45 @@ pub fn target() -> String {
     std::env::current_exe().map(|p| p.display().to_string()).unwrap_or_else(|_| "/usr/local/bin/sanae".into())
 }
 
-/// Download the latest release binary into `dir`, retrying on network errors,
-/// and check that it looks like a real ELF binary. Returns the file path.
+/// Download the latest release binary into `dir` and check that it looks like
+/// a real ELF binary. wget when available, the built-in client otherwise.
 pub async fn download(dir: &Path) -> Result<PathBuf> {
+    std::fs::create_dir_all(dir).ok();
+    let path = dir.join("sanae-update");
+    if which_wget() {
+        let status = tokio::process::Command::new("wget")
+            .args(["-c", "--tries=5", "--waitretry=5", "--timeout=60", "-q", "-O"])
+            .arg(&path)
+            .arg(BINARY)
+            .status()
+            .await
+            .context("running wget")?;
+        if status.success() {
+            let bytes = std::fs::read(&path).with_context(|| format!("reading {}", path.display()))?;
+            check(&bytes)?;
+            return Ok(path);
+        }
+        let _ = std::fs::remove_file(&path);
+    }
+    download_builtin(&path).await?;
+    Ok(path)
+}
+
+fn which_wget() -> bool {
+    std::env::var_os("PATH").map(|p| std::env::split_paths(&p).any(|d| d.join("wget").is_file())).unwrap_or(false)
+}
+
+fn check(bytes: &[u8]) -> Result<()> {
+    if bytes.len() < MIN_SIZE {
+        bail!("the download is too small ({} bytes): not a Sanae binary", bytes.len());
+    }
+    if &bytes[..4] != b"\x7fELF" {
+        bail!("the download is not an ELF binary");
+    }
+    Ok(())
+}
+
+async fn download_builtin(path: &Path) -> Result<()> {
     let http = reqwest::Client::builder()
         .user_agent(concat!("sanae/", env!("CARGO_PKG_VERSION")))
         .connect_timeout(Duration::from_secs(20))
@@ -65,10 +101,8 @@ pub async fn download(dir: &Path) -> Result<PathBuf> {
     for attempt in 1..=4u32 {
         match fetch(&http).await {
             Ok(bytes) => {
-                std::fs::create_dir_all(dir).ok();
-                let path = dir.join("sanae-update");
-                std::fs::write(&path, &bytes).with_context(|| format!("writing {}", path.display()))?;
-                return Ok(path);
+                std::fs::write(path, &bytes).with_context(|| format!("writing {}", path.display()))?;
+                return Ok(());
             }
             Err(e) => {
                 last = e;
@@ -82,12 +116,7 @@ pub async fn download(dir: &Path) -> Result<PathBuf> {
 async fn fetch(http: &reqwest::Client) -> Result<Vec<u8>> {
     let resp = http.get(BINARY).send().await.context("reaching GitHub releases")?.error_for_status()?;
     let bytes = resp.bytes().await.context("receiving the binary")?;
-    if bytes.len() < MIN_SIZE {
-        bail!("the download is too small ({} bytes): not a Sanae binary", bytes.len());
-    }
-    if &bytes[..4] != b"\x7fELF" {
-        bail!("the download is not an ELF binary");
-    }
+    check(&bytes)?;
     Ok(bytes.to_vec())
 }
 
