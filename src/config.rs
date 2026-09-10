@@ -22,11 +22,19 @@ pub struct General {
     pub confirm: bool,
     /// Look for a newer Sanae at start.
     pub check_updates: bool,
+    /// Interface language: en, es, or auto.
+    pub language: String,
 }
 
 impl Default for General {
     fn default() -> Self {
-        Self { aur_helper: "auto".into(), privilege: "auto".into(), confirm: true, check_updates: true }
+        Self {
+            aur_helper: "auto".into(),
+            privilege: "auto".into(),
+            confirm: true,
+            check_updates: true,
+            language: "auto".into(),
+        }
     }
 }
 

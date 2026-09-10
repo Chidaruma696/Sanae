@@ -1,8 +1,14 @@
 //! Sanae · a software store for Arch Linux that lives in the terminal.
 
+/// `format!` through the translation table: positional `{}` only.
+macro_rules! tfmt {
+    ($s:literal $(, $a:expr)* $(,)?) => { $crate::i18n::tf($s, &[$(&$a as &dyn std::fmt::Display),*]) };
+}
+
 mod cache;
 mod config;
 mod exec;
+mod i18n;
 mod index;
 #[cfg(test)]
 mod index_tests;
@@ -110,6 +116,7 @@ async fn main() -> Result<()> {
     let cli = Cli::parse();
     let cache = if cli.no_cache { Cache::disabled() } else { Cache::open() };
     let cfg = Config::load();
+    i18n::set(&cfg.general.language);
     match cli.command {
         None => ui::run(cfg, cache).await,
         Some(Cmd::Search { query, aur, repos, installed, limit, by }) => {

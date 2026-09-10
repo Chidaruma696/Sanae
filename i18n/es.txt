@@ -1,0 +1,193 @@
+# Sanae · español. One `English<TAB>Spanish` per line. Keys are the English strings in the code.
+Store	Tienda
+Search	Buscar
+Installed	Instalados
+Updates	Actualizaciones
+Queue	Cola
+Recipes	Recetas
+Settings	Ajustes
+Info	Info
+Dependencies	Dependencias
+Files	Archivos
+PKGBUILD	PKGBUILD
+all	todos
+explicit	explícitos
+dependencies	dependencias
+orphans	huérfanos
+AUR / local	AUR / local
+? help  q quit	? ayuda  q salir
+Featured	Destacados
+Internet	Internet
+Multimedia	Multimedia
+Graphics	Gráficos
+Office	Oficina
+Development	Desarrollo
+Games	Juegos
+Education	Educación
+System	Sistema
+Utilities	Utilidades
+Other	Otros
+ Shelves 	 Estantes 
+most installed apps you do not have yet	las apps más instaladas que aún no tienes
+by popularity	por popularidad
+ {} · {} apps 	 {} · {} apps 
+No AppStream catalog found.\n\nInstall archlinux-appstream-data (sudo pacman -S archlinux-appstream-data) and press r.\nThe Search tab works without it.	No hay catálogo AppStream.\n\nInstala archlinux-appstream-data (sudo pacman -S archlinux-appstream-data) y pulsa r.\nLa pestaña Buscar funciona sin él.
+type · Enter or ↓ to the results	escribe · Enter o ↓ a los resultados
+/ to type · Esc clears	/ para escribir · Esc borra
+  searching the AUR…	  buscando en el AUR…
+ Search 	 Buscar 
+ {} results 	 {} resultados 
+ Installed · {} 	 Instalados · {} 
+ {} packages · f changes the filter · o queues the orphans 	 {} paquetes · f cambia el filtro · o encola los huérfanos 
+ Arch news 	 Noticias de Arch 
+ read before updating 	 léelas antes de actualizar 
+Checking for updates…	Buscando actualizaciones…
+ Updates 	 Actualizaciones 
+Everything is up to date.	Todo está al día.
+ {} updates 	 {} actualizaciones 
+ u or Enter updates everything 	 u o Enter actualiza todo 
+ Queue · {} 	 Cola · {} 
+ a applies · d drops one · c clears 	 a aplica · d quita una · c vacía 
+Mark packages with space anywhere; they show up here.	Marca paquetes con espacio en cualquier pestaña; aparecen aquí.
+Asking pacman what it would do…	Preguntando a pacman qué haría…
+Install ({}), {} to download	Instalar ({}), {} de descarga
+Remove ({})	Quitar ({})
+ What will happen 	 Qué va a pasar 
+ Recipes 	 Recetas 
+ install and leave it configured · Enter applies 	 instalar y dejar configurado · Enter aplica 
+packages   	paquetes   
+aur        	aur        
+services   	servicios  
+groups     	grupos     
+files      	archivos   
+environment	entorno    
+commands   	comandos   
+\nAlready applied. Enter applies it again (safe).	\nYa aplicada. Enter la aplica otra vez (es seguro).
+\nNot applied yet.	\nAún no aplicada.
+ What it does 	 Qué hace 
+Nothing selected.	Nada seleccionado.
+ Details 	 Detalles 
+ Tab switches 	 Tab cambia 
+source	origen
+installed	instalado
+no	no
+explicitly	explícitamente
+as a dependency	como dependencia
+size	tamaño
+{} installed	{} instalado
+, {} download	, {} de descarga
+popularity	popularidad
+{} · {} votes	{} · {} votos
+{}% of Arch systems have it	el {}% de los sistemas Arch lo tienen
+license	licencia
+url	url
+maintainer	mantenedor
+flagged	marcado
+OUT OF DATE since {}	DESACTUALIZADO desde {}
+groups	grupos
+categories	categorías
+screenshots	capturas
+built	compilado
+ by {}	 por {}
+loading…	cargando…
+depends on	depende de
+optional	opcionales
+build needs	para compilar
+provides	provee
+conflicts	conflictos
+required by	requerido por
+optional for	opcional para
+no dependencies	sin dependencias
+green = installed	verde = instalado
+{} files	{} archivos
+(only AUR packages have a PKGBUILD to show)	(solo los paquetes del AUR tienen PKGBUILD que mostrar)
+(AUR packages list their files only once installed)	(los paquetes del AUR muestran sus archivos solo una vez instalados)
+ Made by Chidaruma · like it? star it at github.com/Chidaruma696	 Hecho por Chidaruma · ¿te gusta? deja una estrella en github.com/Chidaruma696
+shelves/apps	estantes/apps
+move	mover
+mark	marcar
+install now	instalar ya
+open	abrir
+details	detalles
+apply queue	aplicar cola
+help	ayuda
+quit	salir
+type	escribir
+mark remove	marcar quitar
+filter	filtro
+queue orphans	encolar huérfanos
+update everything	actualizar todo
+reload	recargar
+apply	aplicar
+drop line	quitar línea
+clear	vaciar
+scroll	desplazar
+apply recipe	aplicar receta
+toggle / apply	cambiar / aplicar
+Check for a newer Sanae at start	Buscar una Sanae más nueva al abrir
+Update Sanae now	Actualizar Sanae ahora
+AUR helper	Ayudante de AUR
+Administrator tool	Herramienta de administrador
+Nerd Font marks	Marcas con Nerd Font
+Language	Idioma
+on	sí
+off	no
+{} available (you run v{})	{} disponible (tienes v{})
+v{} · Enter fetches the latest release	v{} · Enter descarga la última versión
+auto ({})	auto ({})
+none found	ninguno encontrado
+auto (from the environment)	auto (según el entorno)
+ Settings 	 Ajustes 
+ Enter toggles a setting or enables a source 	 Enter cambia un ajuste o activa una fuente 
+Once every few hours Sanae asks GitHub whether a newer release exists and tells you in the status line. Nothing is downloaded until you ask.	Cada pocas horas Sanae pregunta a GitHub si hay una versión más nueva y te lo dice en la línea de estado. No se descarga nada hasta que lo pidas.
+Downloads the latest release binary and replaces this one (needs your password). Sanae is a single file, so this is the whole update.	Descarga el binario de la última versión y reemplaza este (pide tu contraseña). Sanae es un solo archivo, así que eso es toda la actualización.
+The program that builds AUR packages for you: paru or yay. Auto picks whichever is installed.	El programa que compila los paquetes del AUR por ti: paru o yay. Auto elige el que esté instalado.
+How Sanae becomes root to run pacman: sudo or doas. Auto picks whichever is installed.	Cómo se hace root Sanae para ejecutar pacman: sudo o doas. Auto elige el que esté instalado.
+Use Nerd Font glyphs for the marks in lists. Only if your terminal font has them.	Usar glifos de Nerd Font para las marcas de las listas. Solo si la fuente de tu terminal los tiene.
+The language of this interface: English, Spanish, or whatever the system asks for.	El idioma de esta interfaz: inglés, español, o el que pida el sistema.
+\nAlready enabled.	\nYa activada.
+\nNot enabled. Enter enables it.	\nNo activada. Enter la activa.
+⚠ Third-party repositories, the AUR, Flatpak and Snap are not reviewed by Arch Linux.	⚠ Los repositorios de terceros, el AUR, Flatpak y Snap no los revisa Arch Linux.
+  A package from them can break an update or ship anything. Enable only what you understand, and read PKGBUILDs before building.	  Un paquete de ahí puede romper una actualización o traer cualquier cosa. Activa solo lo que entiendas, y lee los PKGBUILD antes de compilar.
+Sanae and Reimu are made by Chidaruma. Do you like them? Visit github.com/Chidaruma696 and leave a star.	Sanae y Reimu están hechas por Chidaruma. ¿Te gustan? Visita github.com/Chidaruma696 y deja una estrella.
+ About 	 Acerca de 
+ step {}/{} 	 paso {}/{} 
+ output 	 salida 
+ ✖ failed · Enter or Esc to go back 	 ✖ falló · Enter o Esc para volver 
+ ✔ done · Enter or Esc to go back 	 ✔ hecho · Enter o Esc para volver 
+ running · type here to answer prompts (sudo password) · Ctrl+C cancels 	 en marcha · escribe aquí para responder (contraseña de sudo) · Ctrl+C cancela 
+tabs: Store · Search · Installed · Updates · Queue · Recipes · Settings	pestañas: Tienda · Buscar · Instalados · Actualizaciones · Cola · Recetas · Ajustes
+search (Esc or Enter leaves the input)	buscar (Esc o Enter salen del campo)
+move · PgUp/PgDn · g/G first/last	mover · RePág/AvPág · g/G primero/último
+Store: shelves / apps · elsewhere: scroll details	Tienda: estantes / apps · en el resto: desplazar detalles
+mark for install (or remove, if installed)	marcar para instalar (o quitar, si está instalado)
+mark for removal · in the queue: drop the line	marcar para quitar · en la cola: quitar la línea
+install the selected package right now	instalar el paquete seleccionado ahora mismo
+apply the queue	aplicar la cola
+update everything (repos, then AUR)	actualizar todo (repos y luego AUR)
+details: Info · Dependencies · Files · PKGBUILD	detalles: Info · Dependencias · Archivos · PKGBUILD
+Installed: filter · queue all orphans	Instalados: filtro · encolar todos los huérfanos
+reload the package databases	recargar las bases de datos de paquetes
+Settings: self-update, AUR helper, Flatpak, Snap, extra repositories	Ajustes: autoactualización, ayudante de AUR, Flatpak, Snap, repositorios extra
+While a command runs, keys go to it (sudo asks there). Ctrl+C cancels.	Mientras corre un comando, las teclas van a él (sudo pregunta ahí). Ctrl+C cancela.
+{} packages known · config: {}	{} paquetes conocidos · config: {}
+ Keys · any key closes 	 Teclas · cualquier tecla cierra 
+Made by Chidaruma · github.com/Chidaruma696	Hecho por Chidaruma · github.com/Chidaruma696
+No AppStream data: install archlinux-appstream-data for the store shelves.	Sin datos AppStream: instala archlinux-appstream-data para los estantes de la tienda.
+{} in the queue	{} en la cola
+Nothing to do.	Nada que hacer.
+Reading the package databases…	Leyendo las bases de datos de paquetes…
+Package databases reloaded.	Bases de datos de paquetes recargadas.
+Sanae {} is out: Settings (7) → Update Sanae now	Salió Sanae {}: Ajustes (7) → Actualizar Sanae ahora
+{} is already installed	{} ya está instalado
+No orphans (or not checked yet: press f until 'orphans').	No hay huérfanos (o aún no se comprobó: pulsa f hasta 'huérfanos').
+{} orphans queued for removal	{} huérfanos encolados para quitar
+The queue is empty: mark packages with space.	La cola está vacía: marca paquetes con espacio.
+{} news items ask for attention; read them on the Updates tab	{} noticias piden atención; léelas en la pestaña Actualizaciones
+Settings saved.	Ajustes guardados.
+could not save the settings: {}	no se pudieron guardar los ajustes: {}
+Installing {}	Instalando {}
+Applying the queue	Aplicando la cola
+Updating the system	Actualizando el sistema
+Recipe: {}	Receta: {}
+Updating Sanae	Actualizando Sanae

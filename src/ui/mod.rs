@@ -15,6 +15,7 @@ use tokio::sync::mpsc;
 use crate::cache::Cache;
 use crate::config::Config;
 use crate::exec::{ExecEvent, Runner};
+use crate::i18n::t;
 use crate::index::Index;
 use crate::model::{Details, Package, Source, Update};
 use crate::queue::{Action, Preflight, Queue, Step};
@@ -41,13 +42,13 @@ impl Tab {
         [Tab::Store, Tab::Search, Tab::Installed, Tab::Updates, Tab::Queue, Tab::Recipes, Tab::Settings];
     pub fn title(self) -> &'static str {
         match self {
-            Tab::Store => "Store",
-            Tab::Search => "Search",
-            Tab::Installed => "Installed",
-            Tab::Updates => "Updates",
-            Tab::Queue => "Queue",
-            Tab::Recipes => "Recipes",
-            Tab::Settings => "Settings",
+            Tab::Store => t("Store"),
+            Tab::Search => t("Search"),
+            Tab::Installed => t("Installed"),
+            Tab::Updates => t("Updates"),
+            Tab::Queue => t("Queue"),
+            Tab::Recipes => t("Recipes"),
+            Tab::Settings => t("Settings"),
         }
     }
     fn index(self) -> usize {
@@ -67,10 +68,10 @@ impl DetailTab {
     const ALL: [DetailTab; 4] = [DetailTab::Info, DetailTab::Deps, DetailTab::Files, DetailTab::Pkgbuild];
     pub fn title(self) -> &'static str {
         match self {
-            DetailTab::Info => "Info",
-            DetailTab::Deps => "Dependencies",
-            DetailTab::Files => "Files",
-            DetailTab::Pkgbuild => "PKGBUILD",
+            DetailTab::Info => t("Info"),
+            DetailTab::Deps => t("Dependencies"),
+            DetailTab::Files => t("Files"),
+            DetailTab::Pkgbuild => t("PKGBUILD"),
         }
     }
 }
@@ -94,11 +95,11 @@ impl InstalledFilter {
     ];
     pub fn title(self) -> &'static str {
         match self {
-            InstalledFilter::All => "all",
-            InstalledFilter::Explicit => "explicit",
-            InstalledFilter::Dependencies => "dependencies",
-            InstalledFilter::Orphans => "orphans",
-            InstalledFilter::Foreign => "AUR / local",
+            InstalledFilter::All => t("all"),
+            InstalledFilter::Explicit => t("explicit"),
+            InstalledFilter::Dependencies => t("dependencies"),
+            InstalledFilter::Orphans => t("orphans"),
+            InstalledFilter::Foreign => t("AUR / local"),
         }
     }
 }
@@ -259,7 +260,7 @@ pub async fn run(cfg: Config, cache: Cache) -> Result<()> {
         cache,
     };
     if app.apps.is_empty() {
-        app.status = "No AppStream data: install archlinux-appstream-data for the store shelves.".into();
+        app.status = t("No AppStream data: install archlinux-appstream-data for the store shelves.").into();
     }
     app.refresh_store();
     app.refresh_installed();
@@ -345,30 +346,42 @@ impl App {
     /// Settings rows before the sources: id, label, value.
     pub fn settings_rows(&self) -> Vec<(&'static str, String, String)> {
         let helper = match self.cfg.general.aur_helper.as_str() {
-            "auto" | "" => format!("auto ({})", self.cfg.aur_helper().unwrap_or_else(|| "none found".into())),
+            "auto" | "" => tfmt!("auto ({})", self.cfg.aur_helper().unwrap_or_else(|| t("none found").into())),
             h => h.to_string(),
         };
         vec![
             (
                 "check_updates",
-                "Check for a newer Sanae at start".into(),
-                if self.cfg.general.check_updates { "on".into() } else { "off".into() },
+                t("Check for a newer Sanae at start").into(),
+                if self.cfg.general.check_updates { t("on").into() } else { t("off").into() },
             ),
             (
                 "self_update",
-                "Update Sanae now".into(),
+                t("Update Sanae now").into(),
                 match &self.new_release {
-                    Some(t) => format!("{t} available (you run v{})", env!("CARGO_PKG_VERSION")),
-                    None => format!("v{} · Enter fetches the latest release", env!("CARGO_PKG_VERSION")),
+                    Some(tag) => tfmt!("{} available (you run v{})", tag, env!("CARGO_PKG_VERSION")),
+                    None => tfmt!("v{} · Enter fetches the latest release", env!("CARGO_PKG_VERSION")),
                 },
             ),
-            ("aur_helper", "AUR helper".into(), helper),
+            ("aur_helper", t("AUR helper").into(), helper),
             (
                 "privilege",
-                "Administrator tool".into(),
+                t("Administrator tool").into(),
                 format!("{} ({})", self.cfg.general.privilege, self.cfg.privilege()),
             ),
-            ("nerd_font", "Nerd Font marks".into(), if self.cfg.theme.nerd_font { "on".into() } else { "off".into() }),
+            (
+                "nerd_font",
+                t("Nerd Font marks").into(),
+                if self.cfg.theme.nerd_font { t("on").into() } else { t("off").into() },
+            ),
+            (
+                "language",
+                t("Language").into(),
+                match self.cfg.general.language.as_str() {
+                    "auto" | "" => tfmt!("auto ({})", crate::i18n::current()),
+                    l => l.to_string(),
+                },
+            ),
         ]
     }
 
@@ -398,7 +411,7 @@ impl App {
                 "check_updates" => self.cfg.general.check_updates = !self.cfg.general.check_updates,
                 "self_update" => {
                     let steps = crate::selfupdate::update_steps(&self.cfg.privilege());
-                    self.start_run("Updating Sanae", steps);
+                    self.start_run(t("Updating Sanae"), steps);
                     return;
                 }
                 "aur_helper" => {
@@ -419,11 +432,19 @@ impl App {
                     self.cfg.theme.nerd_font = !self.cfg.theme.nerd_font;
                     self.theme = Theme::from_config(&self.cfg.theme);
                 }
+                "language" => {
+                    self.cfg.general.language = match self.cfg.general.language.as_str() {
+                        "auto" | "" => "en".into(),
+                        "en" => "es".into(),
+                        _ => "auto".into(),
+                    };
+                    crate::i18n::set(&self.cfg.general.language);
+                }
                 _ => {}
             }
             match self.cfg.save() {
-                Ok(()) => self.status = "Settings saved.".into(),
-                Err(e) => self.status = format!("could not save the settings: {e}"),
+                Ok(()) => self.status = t("Settings saved.").into(),
+                Err(e) => self.status = tfmt!("could not save the settings: {}", e),
             }
             return;
         }
@@ -600,11 +621,11 @@ impl App {
         }
         let Some(p) = self.index.get(name) else { return };
         if p.source.is_aur() && !p.is_installed() {
-            self.files.insert(name.to_string(), vec!["(AUR packages list their files only once installed)".into()]);
+            self.files.insert(name.to_string(), vec![t("(AUR packages list their files only once installed)").into()]);
             return;
         }
         let (tx, n, installed) = (self.tx.clone(), name.to_string(), p.is_installed());
-        self.files.insert(name.to_string(), vec!["loading…".into()]);
+        self.files.insert(name.to_string(), vec![t("loading…").into()]);
         tokio::task::spawn_blocking(move || {
             let files = pacman::files(&n, installed).unwrap_or_else(|e| vec![format!("{e:#}")]);
             let _ = tx.send(Msg::Files { name: n, files });
@@ -617,11 +638,11 @@ impl App {
         }
         let Some(p) = self.index.get(name) else { return };
         if !p.source.is_aur() {
-            self.pkgbuilds.insert(name.to_string(), "(only AUR packages have a PKGBUILD to show)".into());
+            self.pkgbuilds.insert(name.to_string(), t("(only AUR packages have a PKGBUILD to show)").into());
             return;
         }
         let base = self.details.get(name).and_then(|d| d.package_base.clone()).unwrap_or_else(|| name.to_string());
-        self.pkgbuilds.insert(name.to_string(), "loading…".into());
+        self.pkgbuilds.insert(name.to_string(), t("loading…").into());
         let (tx, n, aur) = (self.tx.clone(), name.to_string(), self.aur.clone());
         tokio::spawn(async move {
             let text = aur.pkgbuild(&base).await.unwrap_or_else(|e| format!("{e:#}"));
@@ -642,7 +663,7 @@ impl App {
     }
 
     fn reload_index(&mut self) {
-        self.busy = Some("Reading the package databases…".into());
+        self.busy = Some(t("Reading the package databases…").into());
         let tx = self.tx.clone();
         tokio::task::spawn_blocking(move || match load_index() {
             Ok(i) => {
@@ -740,14 +761,14 @@ impl App {
         };
         self.queue.toggle(&name, action, aur);
         self.preflight_dirty = true;
-        self.status = format!("{} in the queue", self.queue.len());
+        self.status = tfmt!("{} in the queue", self.queue.len());
     }
 
     // --------------------------------------------------------------- running
 
     fn start_run(&mut self, title: &str, steps: Vec<Step>) {
         if steps.is_empty() {
-            self.status = "Nothing to do.".into();
+            self.status = t("Nothing to do.").into();
             return;
         }
         self.run = Some(RunState {
@@ -932,12 +953,12 @@ impl App {
                 self.refresh_store();
                 self.fetch_updates();
                 self.check_recipes();
-                self.status = "Package databases reloaded.".into();
+                self.status = t("Package databases reloaded.").into();
             }
             Msg::Exec(ev) => self.on_exec(ev),
             Msg::Error(e) => self.status = e,
             Msg::NewRelease(tag) => {
-                self.status = format!("Sanae {tag} is out: Settings (7) → Update Sanae now");
+                self.status = tfmt!("Sanae {} is out: Settings (7) → Update Sanae now", tag);
                 self.new_release = Some(tag);
             }
         }
@@ -1032,13 +1053,13 @@ impl App {
                     && let Some(p) = self.index.get(&n)
                 {
                     if p.is_installed() {
-                        self.status = format!("{n} is already installed");
+                        self.status = tfmt!("{} is already installed", n);
                     } else {
                         let aur = p.source.is_aur();
                         let mut q = Queue::default();
                         q.toggle(&n, Action::Install, aur);
                         let steps = q.plan(&self.cfg);
-                        self.start_run(&format!("Installing {n}"), steps);
+                        self.start_run(&tfmt!("Installing {}", n), steps);
                     }
                 }
             }
@@ -1058,13 +1079,13 @@ impl App {
             KeyCode::Char('o') if self.tab == Tab::Installed => {
                 let orphans = self.orphans.clone().unwrap_or_default();
                 if orphans.is_empty() {
-                    self.status = "No orphans (or not checked yet: press f until 'orphans').".into();
+                    self.status = t("No orphans (or not checked yet: press f until 'orphans').").into();
                 } else {
                     for o in &orphans {
                         self.queue.toggle(o, Action::Remove, false);
                     }
                     self.preflight_dirty = true;
-                    self.status = format!("{} orphans queued for removal", orphans.len());
+                    self.status = tfmt!("{} orphans queued for removal", orphans.len());
                 }
             }
             KeyCode::Char('r') => {
@@ -1147,22 +1168,22 @@ impl App {
 
     fn apply_queue(&mut self) {
         if self.queue.is_empty() {
-            self.status = "The queue is empty: mark packages with space.".into();
+            self.status = t("The queue is empty: mark packages with space.").into();
             return;
         }
         let steps = self.queue.plan(&self.cfg);
-        self.start_run("Applying the queue", steps);
+        self.start_run(t("Applying the queue"), steps);
     }
 
     fn update_all(&mut self) {
         let attention = self.news.iter().filter(|n| n.needs_attention()).count();
         let steps = Queue::update_plan(&self.cfg);
         self.status = if attention > 0 {
-            format!("{attention} news items ask for attention; read them on the Updates tab")
+            tfmt!("{} news items ask for attention; read them on the Updates tab", attention)
         } else {
             String::new()
         };
-        self.start_run("Updating the system", steps);
+        self.start_run(t("Updating the system"), steps);
     }
 
     fn apply_recipe(&mut self) {
@@ -1181,6 +1202,6 @@ impl App {
             }
         }
         steps.extend(r.plan(&opts));
-        self.start_run(&format!("Recipe: {}", r.name), steps);
+        self.start_run(&tfmt!("Recipe: {}", r.name), steps);
     }
 }

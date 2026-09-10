@@ -13,7 +13,7 @@
 
 <br/>
 
-*One static binary · never links libalpm · repos and AUR in one list · recipes that leave things configured*
+*One static binary · never links libalpm · repos and AUR in one list · recipes that leave things configured · English and Spanish*
 
 </div>
 
@@ -66,7 +66,7 @@ sanae
  ←→ shelves/apps  ↑↓ move  space mark  i install now  Enter open  Tab details  a apply queue  ? help  q quit
 ```
 
-**Tabs.** *Store*: shelves from AppStream (Internet, Multimedia, Graphics, Office, Development, Games, Education, System, Utilities) with human names, summaries and how many Arch systems have each app, plus *Featured*: the most installed apps you do not have. *Search*: repositories and the AUR in one list as you type. *Installed*: all, explicit, dependencies, orphans, or AUR/local, with one key to queue every orphan. *Updates*: repositories and AUR, with the Arch news above them. *Queue*: what you marked, what pacman would download and remove, the exact commands. *Recipes*: install and configure in one go. *Settings*: check for a newer Sanae at start and update it in place, AUR helper, sudo/doas, Nerd Font marks, and the extra sources: Flatpak (Flathub), Snap, Chaotic-AUR, the Liquorix kernel repository, BlackArch and ALHP (x86-64-v3/v4 builds), each with what it does and a warning, because nothing outside the official repositories is reviewed by Arch.
+**Tabs.** *Store*: shelves from AppStream (Internet, Multimedia, Graphics, Office, Development, Games, Education, System, Utilities) with human names, summaries and how many Arch systems have each app, plus *Featured*: the most installed apps you do not have. *Search*: repositories and the AUR in one list as you type. *Installed*: all, explicit, dependencies, orphans, or AUR/local, with one key to queue every orphan. *Updates*: repositories and AUR, with the Arch news above them. *Queue*: what you marked, what pacman would download and remove, the exact commands. *Recipes*: install and configure in one go. *Settings*: interface language (English, Spanish, or whatever `LANG` says), check for a newer Sanae at start and update it in place, AUR helper, sudo/doas, Nerd Font marks, and the extra sources: Flatpak (Flathub), Snap, Chaotic-AUR, the Liquorix kernel repository, BlackArch and ALHP (x86-64-v3/v4 builds), each with what it does and a warning, because nothing outside the official repositories is reviewed by Arch.
 
 **Keys.** `1-7` tabs · `/` search · `space` mark · `d` mark for removal · `i` install now · `a` apply the queue · `u` update everything · `Tab` Info / Dependencies / Files / PKGBUILD · `?` everything else. Commands run inside Sanae in a pseudo-terminal: sudo asks for your password right there, the output streams live, Ctrl+C cancels.
 
@@ -117,6 +117,7 @@ notes = "Log out and back in so the docker group applies."
 aur_helper = "auto"   # paru · yay · auto
 privilege = "auto"    # sudo · doas · auto
 check_updates = true  # ask GitHub for a newer Sanae at start
+language = "auto"     # en · es · auto (from LANG)
 
 [theme]
 accent = "#5fd7a7"    # Moriya green
@@ -139,6 +140,7 @@ src/
 ├── exec.rs            runs commands in a pty, streams lines, forwards keystrokes (sudo)
 ├── recipes.rs         TOML recipes, built-in ones embedded, --chroot aware plans
 ├── selfupdate.rs      newer release? and the steps that replace the binary
+├── i18n.rs            t() and tf(): English in the code, i18n/es.txt for Spanish
 ├── recipes/           the recipes shipped in the binary
 ├── sources/
 │   ├── pacman.rs      expac -S / -Q dumps, pacman -Ql / -Fl, -Qdt, -Qm, checkupdates, vercmp
@@ -170,6 +172,7 @@ CI runs format, clippy, tests and builds a static `x86_64-unknown-linux-musl` bi
 ## 🗺️ Roadmap
 
 - `sanae-bin` on the AUR.
+- More languages: add `i18n/<code>.txt` (one `English<TAB>Translation` per line) and register it in `i18n.rs`.
 - Screenshots in the terminal for terminals that can show images.
 - More recipes, and recipes for GNOME and KDE themes.
 - Flatpak, if anyone asks.
