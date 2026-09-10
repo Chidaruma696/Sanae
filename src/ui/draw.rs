@@ -186,14 +186,10 @@ fn draw_store(f: &mut Frame, app: &App, area: Rect) {
         .split(area);
     let shelves: Vec<ListItem> = (0..app.shelf_count())
         .map(|i| {
-            if let Some((g, n)) = app.dark_group_at(i) {
-                let label = if g == super::PURPLE_GROUP { t("Purple team").to_string() } else { g.clone() };
-                return ListItem::new(Line::from(vec![
-                    Span::styled(format!("☠ {label:<12}"), app.theme.warn()),
-                    Span::styled(format!("{n:>5}"), app.theme.dim()),
-                ]));
-            }
             let name = app.shelf_name(i);
+            if name == "Darkside" {
+                return ListItem::new(Line::from(Span::styled("☠ Darkside", app.theme.warn())));
+            }
             let icon = match name {
                 "Featured" => "★",
                 "Internet" => "🌐",
@@ -217,13 +213,17 @@ fn draw_store(f: &mut Frame, app: &App, area: Rect) {
     let mut st = ListState::default().with_selected(Some(app.shelf_sel));
     f.render_stateful_widget(list, cols[0], &mut st);
     let shelf = app.shelf_name(app.shelf_sel);
-    let title = if let Some((g, _)) = app.dark_group_at(app.shelf_sel) {
+    if app.dark_shelf() && app.dark_open.is_none() {
+        draw_dark_groups(f, app, cols[1]);
+        return;
+    }
+    let title = if let Some((g, _)) = app.dark_open.and_then(|d| app.dark_groups.get(d)) {
         let purple = g == super::PURPLE_GROUP;
         let label = if purple { t("Purple team").to_string() } else { g.clone() };
         let sub = if purple {
             t("detection, forensics and hardening · from any repository")
         } else {
-            t("by popularity · A queues the whole group")
+            t("by popularity · A queues the whole group · Esc back")
         };
         Line::from(vec![
             Span::styled(tfmt!(" ☠ Darkside · {} · {} tools ", label, app.store_items.len()), app.theme.warn()),
@@ -236,7 +236,7 @@ fn draw_store(f: &mut Frame, app: &App, area: Rect) {
             Span::styled(format!(" {sub} "), app.theme.dim()),
         ])
     };
-    if app.apps.is_empty() && app.dark_shelf().is_none() {
+    if app.apps.is_empty() && !app.dark_shelf() {
         let p = Paragraph::new(t("No AppStream catalog found.\n\nInstall archlinux-appstream-data (sudo pacman -S archlinux-appstream-data) and press r.\nThe Search tab works without it."))
             .wrap(Wrap { trim: false })
             .block(block(app, title, !app.shelf_focus));
@@ -244,6 +244,34 @@ fn draw_store(f: &mut Frame, app: &App, area: Rect) {
         return;
     }
     draw_list(f, app, cols[1], &app.store_items, app.store_sel, title, !app.shelf_focus);
+}
+
+/// The Darkside shelf before a group is opened: BlackArch's groups with their tool counts.
+fn draw_dark_groups(f: &mut Frame, app: &App, area: Rect) {
+    let items: Vec<ListItem> = app
+        .dark_groups
+        .iter()
+        .map(|(g, n)| {
+            let purple = g == super::PURPLE_GROUP;
+            let label = if purple { t("Purple team").to_string() } else { g.clone() };
+            let what = if purple { t("detection, forensics and hardening · from any repository") } else { "" };
+            ListItem::new(Line::from(vec![
+                Span::styled(format!(" {label:<18}"), app.theme.warn()),
+                Span::styled(format!("{n:>5}  "), app.theme.dim()),
+                Span::styled(what, app.theme.dim()),
+            ]))
+        })
+        .collect();
+    let title = Line::from(vec![
+        Span::styled(tfmt!(" ☠ Darkside · {} groups ", app.dark_groups.len()), app.theme.warn()),
+        Span::styled(format!(" {} ", t("BlackArch tools · Enter opens a group")), app.theme.dim()),
+    ]);
+    let list = List::new(items)
+        .block(block(app, title, !app.shelf_focus))
+        .highlight_style(app.theme.highlight())
+        .highlight_symbol("▸ ");
+    let mut st = ListState::default().with_selected(Some(app.store_sel.min(app.dark_groups.len().saturating_sub(1))));
+    f.render_stateful_widget(list, area, &mut st);
 }
 
 fn draw_installed(f: &mut Frame, app: &App, area: Rect) {
@@ -690,8 +718,11 @@ fn draw_status(f: &mut Frame, app: &App, area: Rect) {
 /// The keys that matter on this tab, always visible.
 fn draw_keys(f: &mut Frame, app: &App, area: Rect) {
     let keys: &[(&str, &str)] = match app.tab {
-        Tab::Store if app.dark_shelf().is_some() => &[
-            ("←→", t("shelves/apps")),
+        Tab::Store if app.dark_shelf() && app.dark_open.is_none() => {
+            &[("←→", t("shelves/apps")), ("↑↓", t("move")), ("Enter", t("open")), ("?", t("help")), ("q", t("quit"))]
+        }
+        Tab::Store if app.dark_open.is_some() => &[
+            ("Esc", t("back")),
             ("↑↓", t("move")),
             ("space", t("mark")),
             ("A", t("queue the group")),
@@ -925,7 +956,7 @@ fn draw_help(f: &mut Frame, app: &App, area: Rect) {
         Line::from(vec![
             k("☠ A"),
             Span::raw(t(
-                "Darkside: with the BlackArch repository enabled, its tools by group as Store shelves · A queues a whole group",
+                "Darkside: with the BlackArch repository enabled, a ☠ shelf in the Store lists its tools by group · Enter opens a group, A queues it",
             )),
         ]),
         Line::from(""),

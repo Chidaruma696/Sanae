@@ -185,9 +185,11 @@ pub struct App {
     pub shelf_focus: bool,
     pub store_items: Vec<String>,
     pub store_sel: usize,
-    /// Darkside: BlackArch groups (name without the prefix, tool count), shown
-    /// as Store shelves after the regular ones.
+    /// Darkside: BlackArch groups (name without the prefix, tool count), behind
+    /// one ☠ Darkside shelf at the end of the Store.
     pub dark_groups: Vec<(String, usize)>,
+    /// The Darkside group whose tools are open (None: the list of groups).
+    pub dark_open: Option<usize>,
     // Installed
     pub inst_filter: InstalledFilter,
     pub inst_items: Vec<String>,
@@ -258,6 +260,7 @@ pub async fn run(cfg: Config, cache: Cache) -> Result<()> {
         store_items: Vec::new(),
         store_sel: 0,
         dark_groups: Vec::new(),
+        dark_open: None,
         inst_filter: InstalledFilter::Explicit,
         inst_items: Vec::new(),
         inst_sel: 0,
@@ -514,8 +517,11 @@ impl App {
     }
 
     fn refresh_store(&mut self) {
-        if let Some(d) = self.dark_shelf() {
-            self.store_items = self.dark_tools(d);
+        if self.dark_shelf() {
+            self.store_items = match self.dark_open {
+                Some(d) => self.dark_tools(d),
+                None => self.dark_groups.iter().map(|(g, _)| g.clone()).collect(),
+            };
             if self.store_sel >= self.store_items.len() {
                 self.store_sel = 0;
             }
@@ -568,9 +574,27 @@ impl App {
         self.refresh_store();
     }
 
-    /// The Darkside group behind the selected shelf, if it is one.
-    pub fn dark_shelf(&self) -> Option<usize> {
-        self.shelf_sel.checked_sub(SHELVES.len() + 1).filter(|d| *d < self.dark_groups.len())
+    /// Is the ☠ Darkside shelf selected?
+    pub fn dark_shelf(&self) -> bool {
+        !self.dark_groups.is_empty() && self.shelf_sel == SHELVES.len() + 1
+    }
+
+    /// Enter on the Darkside group list: open that group's tools.
+    fn dark_enter(&mut self) {
+        if self.dark_groups.get(self.store_sel).is_some() {
+            self.dark_open = Some(self.store_sel);
+            self.store_sel = 0;
+            self.refresh_store();
+            self.on_selection_changed();
+        }
+    }
+
+    /// Back from a group's tools to the list of groups.
+    fn dark_back(&mut self) {
+        if let Some(d) = self.dark_open.take() {
+            self.refresh_store();
+            self.store_sel = d.min(self.store_items.len().saturating_sub(1));
+        }
     }
 
     /// The tools of a Darkside group, most installed first.
@@ -593,7 +617,7 @@ impl App {
 
     /// Queue every tool of the selected Darkside shelf that is not installed yet.
     fn queue_dark_group(&mut self) {
-        if self.dark_shelf().is_none() {
+        if !self.dark_shelf() || self.dark_open.is_none() {
             return;
         }
         let names: Vec<String> = self
@@ -621,13 +645,8 @@ impl App {
         }
     }
 
-    /// The BlackArch group (name, tool count) behind shelf `i`, if it is a Darkside one.
-    pub fn dark_group_at(&self, i: usize) -> Option<&(String, usize)> {
-        i.checked_sub(SHELVES.len() + 1).and_then(|d| self.dark_groups.get(d))
-    }
-
     pub fn shelf_count(&self) -> usize {
-        SHELVES.len() + 1 + self.dark_groups.len()
+        SHELVES.len() + 1 + usize::from(!self.dark_groups.is_empty())
     }
 
     fn refresh_installed(&mut self) {
@@ -828,6 +847,7 @@ impl App {
     pub fn current_name(&self) -> Option<&str> {
         match self.tab {
             Tab::Search => self.results.get(self.search_sel).map(String::as_str),
+            Tab::Store if self.dark_shelf() && self.dark_open.is_none() => None,
             Tab::Store => self.store_items.get(self.store_sel).map(String::as_str),
             Tab::Installed => self.inst_items.get(self.inst_sel).map(String::as_str),
             Tab::Updates => self.updates.as_ref().and_then(|u| u.get(self.upd_sel)).map(|u| u.name.as_str()),
@@ -882,6 +902,7 @@ impl App {
         *sel = next;
         self.detail_scroll = 0;
         if self.tab == Tab::Store && self.shelf_focus {
+            self.dark_open = None;
             self.refresh_store();
         }
         self.on_selection_changed();
@@ -1140,6 +1161,7 @@ impl App {
             return;
         }
         match k.code {
+            KeyCode::Esc | KeyCode::Backspace if self.tab == Tab::Store && self.dark_open.is_some() => self.dark_back(),
             KeyCode::Char('q') | KeyCode::Esc => {
                 if self.tab == Tab::Search && !self.query.is_empty() && k.code == KeyCode::Esc {
                     self.query.clear();
@@ -1162,7 +1184,9 @@ impl App {
             KeyCode::End | KeyCode::Char('G') => self.move_sel(100_000),
             KeyCode::Tab => self.next_detail_tab(),
             KeyCode::Left | KeyCode::Char('h') => {
-                if self.tab == Tab::Store {
+                if self.tab == Tab::Store && !self.shelf_focus && self.dark_open.is_some() {
+                    self.dark_back();
+                } else if self.tab == Tab::Store {
                     self.shelf_focus = true;
                 } else {
                     self.detail_scroll = self.detail_scroll.saturating_sub(5);
@@ -1181,6 +1205,7 @@ impl App {
                     self.shelf_focus = false;
                     self.on_selection_changed();
                 }
+                Tab::Store if self.dark_shelf() && self.dark_open.is_none() => self.dark_enter(),
                 Tab::Recipes => self.apply_recipe(),
                 Tab::Settings => self.settings_activate(),
                 Tab::Queue => self.apply_queue(),
@@ -1188,6 +1213,7 @@ impl App {
                 _ => self.next_detail_tab(),
             },
             KeyCode::Char(' ') => match self.tab {
+                Tab::Store if self.dark_shelf() && self.dark_open.is_none() => self.dark_enter(),
                 Tab::Recipes => self.apply_recipe(),
                 Tab::Settings => self.settings_activate(),
                 Tab::Updates => {}
