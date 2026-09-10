@@ -28,7 +28,7 @@ use crate::sources::aur::{Aur, SearchBy};
 use crate::sources::pacman;
 
 #[derive(Parser)]
-#[command(name = "sanae", version, about = "A software store for Arch Linux that lives in the terminal (experimental)")]
+#[command(name = "sanae", version, about = "A software store for Arch Linux that lives in the terminal")]
 struct Cli {
     /// Machine-readable output.
     #[arg(long, global = true)]

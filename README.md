@@ -11,7 +11,6 @@
 ![Rust](https://img.shields.io/badge/rust-2024-b7410e?style=for-the-badge&logo=rust&logoColor=white)
 ![Dependencies at runtime](https://img.shields.io/badge/runtime%20deps-pacman%20expac-2b2140?style=for-the-badge)
 ![License MIT](https://img.shields.io/badge/license-MIT-1b150d?style=for-the-badge)
-![Experimental](https://img.shields.io/badge/status-experimental-d20f39?style=for-the-badge)
 
 <br/>
 
@@ -22,7 +21,7 @@
 ---
 
 > [!IMPORTANT]
-> **Experimental.** Sanae runs pacman and your AUR helper for you and writes the files its recipes say. Read what the queue and the recipes will do before applying them. The design is in [`DESIGN.md`](DESIGN.md).
+> Sanae runs pacman and your AUR helper for you and writes the files its recipes say. Read what the queue and the recipes will do before applying them. The design is in [`DESIGN.md`](DESIGN.md).
 
 <br/>
 
@@ -180,7 +179,7 @@ CI runs format, clippy, tests and builds a static `x86_64-unknown-linux-musl` bi
 
 ## ⚖️ License
 
-MIT. Sanae is not affiliated with Arch Linux. The name comes from Sanae Kochiya of Touhou Project, the shrine maiden who works miracles.
+MIT. Sanae is not affiliated with Arch Linux. The name comes from Sanae Kochiya of Touhou Project, the shrine maiden who works miracles. Touhou Project and its characters belong to Team Shanghai Alice (ZUN); this is unofficial fan work made under their guidelines for derivative works, with no affiliation or endorsement.
 
 <div align="center">
   <br/>
