@@ -1,0 +1,9 @@
+name = "Development"
+summary = "git, GitHub CLI, lazygit, Neovim, VS Code (open build), Python, Node, Rust, Go, Java, the C/C++ toolchain and the modern terminal tools"
+category = "Development"
+packages = ["git", "github-cli", "lazygit", "neovim", "code", "python", "python-pip", "python-pipx", "nodejs", "npm", "rustup", "go", "jdk-openjdk", "gcc", "clang", "cmake", "make", "ninja", "gdb", "shellcheck", "tmux", "jq", "ripgrep", "fd", "bat", "eza", "fzf", "zoxide"]
+check = "pacman -Qq lazygit neovim ripgrep >/dev/null 2>&1"
+
+[[commands]]
+run = "rustup default stable >/dev/null 2>&1 || true"
+as = "user"

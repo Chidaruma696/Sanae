@@ -1,26 +1,33 @@
 //! Sanae · a software store for Arch Linux that lives in the terminal.
 
-// Parts of the data layer are only reached by the interface, which lands with milestone 2.
-#![allow(dead_code)]
-
 mod cache;
+mod config;
+mod exec;
 mod index;
 #[cfg(test)]
 mod index_tests;
 mod model;
+mod queue;
+mod recipes;
 mod sources;
+mod ui;
+
+use std::path::PathBuf;
 
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 
 use crate::cache::Cache;
+use crate::config::Config;
 use crate::index::Index;
 use crate::model::{Package, Source};
+use crate::queue::{Action, Queue};
+use crate::recipes::ApplyOptions;
 use crate::sources::aur::{Aur, SearchBy};
 use crate::sources::pacman;
 
 #[derive(Parser)]
-#[command(name = "sanae", version, about = "A software store for Arch Linux that lives in the terminal")]
+#[command(name = "sanae", version, about = "A software store for Arch Linux that lives in the terminal (experimental)")]
 struct Cli {
     /// Machine-readable output.
     #[arg(long, global = true)]
@@ -48,6 +55,9 @@ enum Cmd {
         installed: bool,
         #[arg(short, long, default_value_t = 30)]
         limit: usize,
+        /// AUR field to search: name, name-desc, maintainer, depends, makedepends, optdepends, provides, keywords, groups.
+        #[arg(long, default_value = "name-desc")]
+        by: String,
     },
     /// Everything about one package.
     Info { name: String },
@@ -65,8 +75,29 @@ enum Cmd {
     },
     /// Available updates from the repositories and the AUR.
     Updates,
+    /// Update everything: repositories, then the AUR.
+    Update,
+    /// Install packages (repositories or AUR, sorted out for you).
+    Install { packages: Vec<String> },
+    /// Remove packages and their unneeded dependencies.
+    Remove { packages: Vec<String> },
     /// Which package owns a file or command.
     Owner { path: String },
+    /// The recipes and whether they are applied.
+    Recipes,
+    /// Apply recipes: install their packages and leave things configured.
+    Apply {
+        recipes: Vec<String>,
+        /// A mounted installation (for example /mnt from the Arch ISO).
+        #[arg(long)]
+        chroot: Option<PathBuf>,
+        /// The user that gets groups, home files and AUR builds.
+        #[arg(long)]
+        user: Option<String>,
+        /// Print the commands instead of running them.
+        #[arg(long)]
+        dry_run: bool,
+    },
     /// Remove Sanae's cache.
     Clean,
 }
@@ -75,26 +106,33 @@ enum Cmd {
 async fn main() -> Result<()> {
     let cli = Cli::parse();
     let cache = if cli.no_cache { Cache::disabled() } else { Cache::open() };
+    let cfg = Config::load();
     match cli.command {
-        None => {
-            // The TUI arrives with milestone 2.
-            eprintln!(
-                "The interface is not here yet. Try: sanae search <text>, sanae info <package>, sanae installed, sanae updates"
-            );
-            Ok(())
-        }
-        Some(Cmd::Search { query, aur, repos, installed, limit }) => {
-            cmd_search(&query, aur, repos, installed, limit, cli.json, cache).await
+        None => ui::run(cfg, cache).await,
+        Some(Cmd::Search { query, aur, repos, installed, limit, by }) => {
+            let by = SearchBy::parse(&by).ok_or_else(|| anyhow::anyhow!("unknown --by {by}"))?;
+            cmd_search(&query, by, aur, repos, installed, limit, cli.json, cache).await
         }
         Some(Cmd::Info { name }) => cmd_info(&name, cli.json, cache).await,
         Some(Cmd::Installed { explicit, orphans, foreign }) => cmd_installed(explicit, orphans, foreign, cli.json),
         Some(Cmd::Updates) => cmd_updates(cli.json, cache).await,
+        Some(Cmd::Update) => exec::run_inherit(&Queue::update_plan(&cfg)),
+        Some(Cmd::Install { packages }) => cmd_install(&packages, &cfg, cache).await,
+        Some(Cmd::Remove { packages }) => {
+            let mut q = Queue::default();
+            for p in &packages {
+                q.toggle(p, Action::Remove, false);
+            }
+            exec::run_inherit(&q.plan(&cfg))
+        }
         Some(Cmd::Owner { path }) => {
             for p in pacman::owner_of(&path)? {
                 println!("{p}");
             }
             Ok(())
         }
+        Some(Cmd::Recipes) => cmd_recipes(cli.json),
+        Some(Cmd::Apply { recipes, chroot, user, dry_run }) => cmd_apply(&recipes, chroot, user, dry_run, &cfg),
         Some(Cmd::Clean) => {
             let n = cache.clear()?;
             println!("removed {n} cached files from {}", cache.dir().display());
@@ -104,13 +142,15 @@ async fn main() -> Result<()> {
 }
 
 fn load_index() -> Result<Index> {
-    let sync = pacman::sync_all().context("reading the package databases")?;
+    let sync = pacman::sync_all().context("reading the package databases (is expac installed?)")?;
     let local = pacman::local_all().context("reading the installed packages")?;
     Ok(Index::build(sync, local))
 }
 
+#[allow(clippy::too_many_arguments)]
 async fn cmd_search(
     query: &str,
+    by: SearchBy,
     aur_only: bool,
     repos_only: bool,
     installed_only: bool,
@@ -121,7 +161,7 @@ async fn cmd_search(
     let mut index = load_index()?;
     if !repos_only {
         let aur = Aur::new(cache)?;
-        match aur.search(query, SearchBy::NameDesc).await {
+        match aur.search(query, by).await {
             Ok(found) => index.merge_aur(found.iter().map(|r| r.to_package()).collect()),
             Err(e) => eprintln!("warning: {e:#}"),
         }
@@ -288,7 +328,6 @@ fn cmd_installed(explicit: bool, orphans: bool, foreign: bool, json: bool) -> Re
 
 async fn cmd_updates(json: bool, cache: Cache) -> Result<()> {
     let mut ups = pacman::updates().context("checkupdates (install pacman-contrib)")?;
-    // AUR: compare every foreign package with the RPC.
     let foreign = pacman::foreign()?;
     if !foreign.is_empty() {
         let index = load_index()?;
@@ -327,22 +366,111 @@ async fn cmd_updates(json: bool, cache: Cache) -> Result<()> {
     Ok(())
 }
 
+async fn cmd_install(packages: &[String], cfg: &Config, cache: Cache) -> Result<()> {
+    let index = load_index()?;
+    let mut q = Queue::default();
+    let mut unknown = Vec::new();
+    for p in packages {
+        match index.get(p) {
+            Some(pkg) => q.toggle(p, Action::Install, pkg.source.is_aur()),
+            None => unknown.push(p.clone()),
+        }
+    }
+    if !unknown.is_empty() {
+        let aur = Aur::new(cache)?;
+        let found = aur.info(&unknown).await.unwrap_or_default();
+        for p in &unknown {
+            if found.iter().any(|r| r.name == *p) {
+                q.toggle(p, Action::Install, true);
+            } else {
+                anyhow::bail!("no package named {p} in the repositories or the AUR");
+            }
+        }
+    }
+    let pf = q.preflight();
+    if !pf.installs.is_empty() {
+        eprintln!("Will install ({}, {} to download):", pf.installs.len(), human(pf.download_bytes));
+        for i in &pf.installs {
+            eprintln!("  {i}");
+        }
+    }
+    for p in &pf.problems {
+        eprintln!("warning: {p}");
+    }
+    exec::run_inherit(&q.plan(cfg))
+}
+
+fn cmd_recipes(json: bool) -> Result<()> {
+    let all = recipes::load_all();
+    let index = load_index().ok();
+    let installed = |p: &str| index.as_ref().and_then(|i| i.get(p)).is_some_and(|p| p.is_installed());
+    if json {
+        let rows: Vec<serde_json::Value> = all.iter().map(|r| serde_json::json!({ "id": r.id, "name": r.name, "summary": r.summary, "category": r.category, "packages": r.packages, "aur": r.aur, "applied": r.is_applied(&installed) })).collect();
+        println!("{}", serde_json::to_string_pretty(&rows)?);
+        return Ok(());
+    }
+    for r in &all {
+        let mark = if r.is_applied(&installed) { "✔" } else { "○" };
+        println!("{mark} {:<22} {:<12} {}", r.id, r.category, r.summary);
+    }
+    Ok(())
+}
+
+fn cmd_apply(ids: &[String], chroot: Option<PathBuf>, user: Option<String>, dry_run: bool, cfg: &Config) -> Result<()> {
+    if ids.is_empty() {
+        anyhow::bail!("say which recipes: sanae apply fonts docker …  (sanae recipes lists them)");
+    }
+    let all = recipes::load_all();
+    let user = user
+        .or_else(|| std::env::var("SUDO_USER").ok())
+        .or_else(|| std::env::var("USER").ok())
+        .unwrap_or_else(|| "root".into());
+    let opts = ApplyOptions {
+        chroot,
+        user,
+        privilege: cfg.privilege(),
+        aur_helper: cfg.aur_helper().or_else(|| Some("paru".into())),
+    };
+    let mut steps = Vec::new();
+    let mut done = std::collections::HashSet::new();
+    for id in ids {
+        let Some(r) = recipes::find(&all, id) else { anyhow::bail!("no recipe named {id}") };
+        for need in &r.needs {
+            if done.insert(need.clone())
+                && let Some(dep) = recipes::find(&all, need)
+            {
+                steps.extend(dep.plan(&opts));
+            }
+        }
+        if done.insert(id.clone()) {
+            steps.extend(r.plan(&opts));
+        }
+    }
+    if dry_run {
+        for s in &steps {
+            println!("# {}\n{}", s.title, s.command_line());
+        }
+        return Ok(());
+    }
+    exec::run_inherit(&steps)
+}
+
 fn section(title: &str, items: &[String]) {
     if !items.is_empty() {
         println!("  {title:<12} {}", items.join(", "));
     }
 }
 
-fn truncate(s: &str, n: usize) -> String {
+pub fn truncate(s: &str, n: usize) -> String {
     if s.chars().count() <= n {
         s.to_string()
     } else {
-        let cut: String = s.chars().take(n - 1).collect();
+        let cut: String = s.chars().take(n.saturating_sub(1)).collect();
         format!("{cut}…")
     }
 }
 
-fn human(bytes: u64) -> String {
+pub fn human(bytes: u64) -> String {
     const UNITS: [&str; 5] = ["B", "KiB", "MiB", "GiB", "TiB"];
     let mut v = bytes as f64;
     let mut u = 0;
@@ -353,6 +481,6 @@ fn human(bytes: u64) -> String {
     if u == 0 { format!("{bytes} B") } else { format!("{v:.1} {}", UNITS[u]) }
 }
 
-fn date(ts: i64) -> String {
+pub fn date(ts: i64) -> String {
     chrono::DateTime::from_timestamp(ts, 0).map(|d| d.format("%Y-%m-%d").to_string()).unwrap_or_else(|| ts.to_string())
 }

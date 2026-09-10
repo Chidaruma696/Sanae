@@ -65,10 +65,6 @@ impl Index {
         self.packages.len()
     }
 
-    pub fn is_empty(&self) -> bool {
-        self.packages.is_empty()
-    }
-
     /// Add or refresh AUR packages (search results, info on foreign packages).
     pub fn merge_aur(&mut self, aur: Vec<Package>) {
         for mut a in aur {

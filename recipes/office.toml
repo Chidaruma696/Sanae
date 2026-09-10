@@ -1,0 +1,5 @@
+name = "Office"
+summary = "LibreOffice, spell checking in English and Spanish, Thunderbird, PDF Arranger"
+category = "Office"
+packages = ["libreoffice-fresh", "hunspell", "hunspell-en_us", "hunspell-es_any", "hyphen", "hyphen-en", "libmythes", "mythes-en", "thunderbird", "pdfarranger"]
+check = "pacman -Qq libreoffice-fresh >/dev/null 2>&1"

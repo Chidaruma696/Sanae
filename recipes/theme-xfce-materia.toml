@@ -1,0 +1,30 @@
+name = "XFCE theme: Materia"
+summary = "Materia GTK and window theme with Papirus-Dark icons, set as your user's default (the next login applies it)"
+category = "Look"
+packages = ["materia-gtk-theme", "papirus-icon-theme"]
+
+check = "test -d /usr/share/themes/Materia-dark && grep -q 'Materia-dark' ~/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml 2>/dev/null"
+notes = "Applies at the next XFCE login. Change it any time in Settings > Appearance."
+
+[[files]]
+path = "~/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml"
+user = true
+content = """<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xsettings" version="1.0">
+  <property name="Net" type="empty">
+    <property name="ThemeName" type="string" value="Materia-dark"/>
+    <property name="IconThemeName" type="string" value="Papirus-Dark"/>
+  </property>
+</channel>
+"""
+
+[[files]]
+path = "~/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml"
+user = true
+content = """<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xfwm4" version="1.0">
+  <property name="general" type="empty">
+    <property name="theme" type="string" value="Materia-dark"/>
+  </property>
+</channel>
+"""

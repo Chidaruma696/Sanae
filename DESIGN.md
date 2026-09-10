@@ -4,6 +4,8 @@
 
 Documento de diseño previo a escribir código. Objetivo: que Sanae quede bien pensada antes de integrarla con Reimu y de simplificar Reimu. Fecha: 2026-09-10.
 
+**Estado:** hitos 1 a 5 implementados el 2026-09-10 (datos, interfaz, tienda, recetas, integración con Reimu). Pendiente: `sanae-bin` en el AUR y el recorte parcial de Reimu.
+
 ---
 
 ## 1. Qué es Sanae y qué no es

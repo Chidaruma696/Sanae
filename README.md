@@ -11,6 +11,7 @@
 ![Rust](https://img.shields.io/badge/rust-2024-b7410e?style=for-the-badge&logo=rust&logoColor=white)
 ![Dependencies at runtime](https://img.shields.io/badge/runtime%20deps-pacman%20expac-2b2140?style=for-the-badge)
 ![License MIT](https://img.shields.io/badge/license-MIT-1b150d?style=for-the-badge)
+![Experimental](https://img.shields.io/badge/status-experimental-d20f39?style=for-the-badge)
 
 <br/>
 
@@ -20,8 +21,8 @@
 
 ---
 
-> [!NOTE]
-> Sanae is being built in milestones. This is **milestone 1: the data layer and the command line**. The store interface (milestone 2 and 3) and the recipes (milestone 4) come next. The design is in [`DESIGN.md`](DESIGN.md).
+> [!IMPORTANT]
+> **Experimental.** Sanae runs pacman and your AUR helper for you and writes the files its recipes say. Read what the queue and the recipes will do before applying them. The design is in [`DESIGN.md`](DESIGN.md).
 
 <br/>
 
@@ -37,9 +38,40 @@ Three rules shape it:
 
 <br/>
 
-## 🚀 Use it (milestone 1)
+## 🚀 Use it
 
-Needs `expac` and `pacman-contrib` (for `checkupdates`), both in the official repositories. An AUR helper (paru or yay) is only needed once installing lands.
+Needs `expac` and `pacman-contrib` (for `checkupdates`); `archlinux-appstream-data` fills the store shelves; paru or yay handle the AUR. All in the official repositories:
+
+```sh
+sudo pacman -S --needed expac pacman-contrib archlinux-appstream-data
+curl -fsSL https://github.com/Chidaruma696/Sanae/releases/latest/download/sanae-x86_64-linux -o sanae
+chmod +x sanae && sudo mv sanae /usr/local/bin/
+sanae
+```
+
+[Reimu](https://github.com/Chidaruma696/Reimu) offers to do exactly this at the end of an installation.
+
+```
+ 早苗 Sanae   1 Store · 2 Search · 3 Installed · 4 Updates (7) · 5 Queue (2) · 6 Recipes            ? help  q quit
+╭ Shelves ───────────╮╭ Internet · 148 apps · by popularity ─────────────────────────────────────────────╮
+│ ★ Featured         ││ ✔ extra     Firefox  (firefox)                69.2%  Web Browser                  │
+│▸🌐 Internet        ││   extra     Chromium  (chromium)              31.0%  Web browser                  │
+│ 🎵 Multimedia      ││ + extra     qBittorrent  (qbittorrent)        18.3%  BitTorrent client            │
+│ 🎨 Graphics        ││   extra     Telegram Desktop  (telegram-de…)  15.1%  Messaging                    │
+╰────────────────────╯╰──────────────────────────────────────────────────────────────────────────────────╯
+╭ firefox 143.0-1  Info  Dependencies  Files  PKGBUILD  Tab switches ───────────────────────────────────╮
+│ Firefox  ·  Web Browser                                                                                │
+│ source      extra        installed   143.0-1 · explicitly · 2026-08-30                                 │
+│ size        262.1 MiB installed, 70.0 MiB download      popularity  69.2% of Arch systems have it      │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+ ←→ shelves/apps · space mark · i install now · Enter open
+```
+
+**Tabs.** *Store*: shelves from AppStream (Internet, Multimedia, Graphics, Office, Development, Games, Education, System, Utilities) with human names, summaries and how many Arch systems have each app, plus *Featured*: the most installed apps you do not have. *Search*: repositories and the AUR in one list as you type. *Installed*: all, explicit, dependencies, orphans, or AUR/local, with one key to queue every orphan. *Updates*: repositories and AUR, with the Arch news above them. *Queue*: what you marked, what pacman would download and remove, the exact commands. *Recipes*: install and configure in one go.
+
+**Keys.** `1-6` tabs · `/` search · `space` mark · `d` mark for removal · `i` install now · `a` apply the queue · `u` update everything · `Tab` Info / Dependencies / Files / PKGBUILD · `?` everything else. Commands run inside Sanae in a pseudo-terminal: sudo asks for your password right there, the output streams live, Ctrl+C cancels.
+
+### Command line
 
 ```sh
 sanae search firefox            # repositories and the AUR, fuzzy, installed ones marked
@@ -50,10 +82,45 @@ sanae installed --orphans       # dependencies nothing needs any more
 sanae installed --foreign       # from the AUR or built locally
 sanae updates                   # repository updates via checkupdates, AUR ones via the RPC
 sanae owner /usr/bin/vim        # which package brings a file
+sanae install firefox spotify   # repos and AUR sorted out, with what pacman will download shown first
+sanae remove nano
+sanae update                    # pacman -Syu, then the AUR helper
+sanae recipes                   # the recipes and whether each is applied
+sanae apply docker fonts        # install and configure
+sanae apply --chroot /mnt --user jp qemu-kvm --dry-run   # inside a fresh installation, printing the commands
 sanae clean                     # drop Sanae's cache (~/.cache/sanae)
 ```
 
-Add `--json` to any of them for machine-readable output.
+Add `--json` to `search`, `info`, `installed`, `updates` and `recipes` for machine-readable output.
+
+### Recipes
+
+A recipe is a small TOML file: packages, AUR packages, services to enable, groups to join, files to write, lines for `/etc/environment`, commands, and a `check` that says whether it is already applied. Every step is safe to repeat. Sanae ships with: fonts, japanese, qemu-kvm, docker, virtualbox, gaming, development, office, multimedia, graphics, internet, utilities, printing, bluetooth, and XFCE themes (Arc, Greybird, Materia, Catppuccin). Drop your own in `~/.config/sanae/recipes/` or `/etc/sanae/recipes/`.
+
+```toml
+name = "Docker"
+summary = "Docker engine with Compose and Buildx, the service enabled and your user in the docker group"
+packages = ["docker", "docker-compose", "docker-buildx"]
+services = ["docker.service"]
+groups = ["docker"]
+check = "systemctl is-enabled docker.service >/dev/null 2>&1 && id -nG | grep -qw docker"
+notes = "Log out and back in so the docker group applies."
+```
+
+### Configuration
+
+`~/.config/sanae/config.toml`, every key optional:
+
+```toml
+[general]
+aur_helper = "auto"   # paru · yay · auto
+privilege = "auto"    # sudo · doas · auto
+
+[theme]
+accent = "#5fd7a7"    # Moriya green
+accent2 = "#87afff"   # lake blue
+nerd_font = false     # Nerd Font glyphs for the marks
+```
 
 <br/>
 
@@ -61,13 +128,25 @@ Add `--json` to any of them for machine-readable output.
 
 ```
 src/
-├── main.rs            command line (clap); the interface arrives in milestone 2
+├── main.rs            command line (clap) and the entry into the interface
 ├── model.rs           Package, Installed, Details, Update: the one shape every source maps into
 ├── index.rs           in-memory index of every package, fuzzy search with nucleo
 ├── cache.rs           small file cache under ~/.cache/sanae, safe to delete
-└── sources/
-    ├── pacman.rs      expac -S / -Q dumps, pacman -Ql / -Fl, -Qdt, -Qm, checkupdates, vercmp
-    └── aur.rs         AUR RPC v5: search (name, name-desc, keywords…), info in batches, PKGBUILD
+├── config.rs          ~/.config/sanae/config.toml
+├── queue.rs           the queue, its preflight (pacman --print) and the commands that apply it
+├── exec.rs            runs commands in a pty, streams lines, forwards keystrokes (sudo)
+├── recipes.rs         TOML recipes, built-in ones embedded, --chroot aware plans
+├── recipes/           the recipes shipped in the binary
+├── sources/
+│   ├── pacman.rs      expac -S / -Q dumps, pacman -Ql / -Fl, -Qdt, -Qm, checkupdates, vercmp
+│   ├── aur.rs         AUR RPC v5: search (name, name-desc, keywords…), info in batches, PKGBUILD
+│   ├── appstream.rs   /usr/share/swcatalog: names, summaries, shelves, screenshots
+│   ├── pkgstats.rs    popularity from pkgstats.archlinux.de
+│   └── news.rs        the Arch news feed
+└── ui/
+    ├── mod.rs         state, keys, background work
+    ├── draw.rs        rendering with ratatui
+    └── theme.rs       colors and marks
 ```
 
 Why no libalpm: pacman 7.1 ships `libalpm.so=16` while the Rust bindings target 15. Linking would mean rebuilding Sanae at every pacman release; `expac` and `pacman` have had the same interface for a decade. Reading the sync databases through `expac` takes well under a second for the ~15 000 official packages.
@@ -87,12 +166,10 @@ CI runs format, clippy, tests and builds a static `x86_64-unknown-linux-musl` bi
 
 ## 🗺️ Roadmap
 
-1. ~~Data layer and CLI~~
-2. Interface: search, details, installed, queue, execution with sudo inside the TUI
-3. Store: AppStream categories and human names, popularity from pkgstats, updates with the Arch news
-4. Recipes and `sanae apply --chroot`
-5. Integration with Reimu
-6. Polish, theme file, `sanae-bin` on the AUR
+- `sanae-bin` on the AUR.
+- Screenshots in the terminal for terminals that can show images.
+- More recipes, and recipes for GNOME and KDE themes.
+- Flatpak, if anyone asks.
 
 <br/>
 

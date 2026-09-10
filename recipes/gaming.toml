@@ -1,0 +1,7 @@
+name = "Gaming"
+summary = "Steam, Lutris, Wine, GameMode, MangoHud, Gamescope, Heroic and ProtonUp. Needs the multilib repository"
+category = "Games"
+packages = ["steam", "lutris", "wine-staging", "winetricks", "gamemode", "lib32-gamemode", "mangohud", "lib32-mangohud", "gamescope"]
+aur = ["protonup-qt", "heroic-games-launcher-bin"]
+check = "pacman -Qq steam >/dev/null 2>&1"
+notes = "If steam is not found, enable [multilib] in /etc/pacman.conf first (Reimu does it when you pick it)."
