@@ -1,0 +1,193 @@
+# Sanae · Français. One `English<TAB>Français` per line. Keys are the English strings in the code.
+Store	Boutique
+Search	Recherche
+Installed	Installés
+Updates	Mises à jour
+Queue	File
+Recipes	Recettes
+Settings	Réglages
+Info	Infos
+Dependencies	Dépendances
+Files	Fichiers
+PKGBUILD	PKGBUILD
+all	tous
+explicit	explicites
+dependencies	dépendances
+orphans	orphelins
+AUR / local	AUR / local
+? help  q quit	? aide  q quitter
+Featured	À la une
+Internet	Internet
+Multimedia	Multimédia
+Graphics	Graphisme
+Office	Bureautique
+Development	Développement
+Games	Jeux
+Education	Éducation
+System	Système
+Utilities	Utilitaires
+Other	Autres
+ Shelves 	 Rayons 
+most installed apps you do not have yet	les apps les plus installées que vous n'avez pas encore
+by popularity	par popularité
+ {} · {} apps 	 {} · {} apps 
+No AppStream catalog found.\n\nInstall archlinux-appstream-data (sudo pacman -S archlinux-appstream-data) and press r.\nThe Search tab works without it.	Aucun catalogue AppStream trouvé.\n\nInstallez archlinux-appstream-data (sudo pacman -S archlinux-appstream-data) et appuyez sur r.\nL'onglet Recherche fonctionne sans.
+type · Enter or ↓ to the results	tapez · Entrée ou ↓ vers les résultats
+/ to type · Esc clears	/ pour taper · Échap efface
+  searching the AUR…	  recherche dans l'AUR…
+ Search 	 Recherche 
+ {} results 	 {} résultats 
+ Installed · {} 	 Installés · {} 
+ {} packages · f changes the filter · o queues the orphans 	 {} paquets · f change le filtre · o met les orphelins en file 
+ Arch news 	 Actualités Arch 
+ read before updating 	 à lire avant de mettre à jour 
+Checking for updates…	Recherche de mises à jour…
+ Updates 	 Mises à jour 
+Everything is up to date.	Tout est à jour.
+ {} updates 	 {} mises à jour 
+ u or Enter updates everything 	 u ou Entrée met tout à jour 
+ Queue · {} 	 File · {} 
+ a applies · d drops one · c clears 	 a applique · d en retire une · c vide 
+Mark packages with space anywhere; they show up here.	Marquez des paquets avec espace n'importe où ; ils apparaissent ici.
+Asking pacman what it would do…	Demande à pacman ce qu'il ferait…
+Install ({}), {} to download	Installer ({}), {} à télécharger
+Remove ({})	Retirer ({})
+ What will happen 	 Ce qui va se passer 
+ Recipes 	 Recettes 
+ install and leave it configured · Enter applies 	 installer et laisser configuré · Entrée applique 
+packages   	paquets    
+aur        	aur        
+services   	services   
+groups     	groupes    
+files      	fichiers   
+environment	environn.  
+commands   	commandes  
+\nAlready applied. Enter applies it again (safe).	\nDéjà appliquée. Entrée l'applique à nouveau (sans risque).
+\nNot applied yet.	\nPas encore appliquée.
+ What it does 	 Ce qu'elle fait 
+Nothing selected.	Rien de sélectionné.
+ Details 	 Détails 
+ Tab switches 	 Tab change 
+source	source
+installed	installé
+no	non
+explicitly	explicitement
+as a dependency	comme dépendance
+size	taille
+{} installed	{} installé
+, {} download	, {} à télécharger
+popularity	popularité
+{} · {} votes	{} · {} votes
+{}% of Arch systems have it	{} % des systèmes Arch l'ont
+license	licence
+url	url
+maintainer	mainteneur
+flagged	signalé
+OUT OF DATE since {}	OBSOLÈTE depuis {}
+groups	groupes
+categories	catégories
+screenshots	captures
+built	compilé
+ by {}	 par {}
+loading…	chargement…
+depends on	dépend de
+optional	optionnelles
+build needs	pour compiler
+provides	fournit
+conflicts	conflits
+required by	requis par
+optional for	optionnel pour
+no dependencies	aucune dépendance
+green = installed	vert = installé
+{} files	{} fichiers
+(only AUR packages have a PKGBUILD to show)	(seuls les paquets AUR ont un PKGBUILD à montrer)
+(AUR packages list their files only once installed)	(les paquets AUR ne listent leurs fichiers qu'une fois installés)
+ Made by Chidaruma · like it? star it at github.com/Chidaruma696	 Créé par Chidaruma · ça vous plaît ? une étoile sur github.com/Chidaruma696
+shelves/apps	rayons/apps
+move	déplacer
+mark	marquer
+install now	installer maintenant
+open	ouvrir
+details	détails
+apply queue	appliquer la file
+help	aide
+quit	quitter
+type	taper
+mark remove	marquer à retirer
+filter	filtre
+queue orphans	orphelins en file
+update everything	tout mettre à jour
+reload	recharger
+apply	appliquer
+drop line	retirer la ligne
+clear	vider
+scroll	défiler
+apply recipe	appliquer la recette
+toggle / apply	basculer / appliquer
+Check for a newer Sanae at start	Chercher un Sanae plus récent au démarrage
+Update Sanae now	Mettre à jour Sanae maintenant
+AUR helper	Assistant AUR
+Administrator tool	Outil d'administration
+Nerd Font marks	Marques Nerd Font
+Language	Langue
+on	oui
+off	non
+{} available (you run v{})	{} disponible (vous avez v{})
+v{} · Enter fetches the latest release	v{} · Entrée récupère la dernière version
+auto ({})	auto ({})
+none found	aucun trouvé
+auto (from the environment)	auto (selon l'environnement)
+ Settings 	 Réglages 
+ Enter toggles a setting or enables a source 	 Entrée bascule un réglage ou active une source 
+Once every few hours Sanae asks GitHub whether a newer release exists and tells you in the status line. Nothing is downloaded until you ask.	Toutes les quelques heures, Sanae demande à GitHub s'il existe une version plus récente et vous le dit dans la ligne d'état. Rien n'est téléchargé sans votre demande.
+Downloads the latest release binary and replaces this one (needs your password). Sanae is a single file, so this is the whole update.	Télécharge le binaire de la dernière version et remplace celui-ci (demande votre mot de passe). Sanae est un seul fichier : c'est toute la mise à jour.
+The program that builds AUR packages for you: paru or yay. Auto picks whichever is installed.	Le programme qui compile les paquets AUR pour vous : paru ou yay. Auto prend celui qui est installé.
+How Sanae becomes root to run pacman: sudo or doas. Auto picks whichever is installed.	Comment Sanae devient root pour lancer pacman : sudo ou doas. Auto prend celui qui est installé.
+Use Nerd Font glyphs for the marks in lists. Only if your terminal font has them.	Utiliser des glyphes Nerd Font pour les marques des listes. Seulement si votre police de terminal les a.
+The language of this interface. Auto follows the system language.	La langue de cette interface. Auto suit la langue du système.
+\nAlready enabled.	\nDéjà activée.
+\nNot enabled. Enter enables it.	\nPas activée. Entrée l'active.
+⚠ Third-party repositories, the AUR, Flatpak and Snap are not reviewed by Arch Linux.	⚠ Les dépôts tiers, l'AUR, Flatpak et Snap ne sont pas relus par Arch Linux.
+  A package from them can break an update or ship anything. Enable only what you understand, and read PKGBUILDs before building.	  Un paquet venu de là peut casser une mise à jour ou contenir n'importe quoi. N'activez que ce que vous comprenez, et lisez les PKGBUILD avant de compiler.
+Sanae and Reimu are made by Chidaruma. Do you like them? Visit github.com/Chidaruma696 and leave a star.	Sanae et Reimu sont créés par Chidaruma. Ça vous plaît ? Passez sur github.com/Chidaruma696 et laissez une étoile.
+ About 	 À propos 
+ step {}/{} 	 étape {}/{} 
+ output 	 sortie 
+ ✖ failed · Enter or Esc to go back 	 ✖ échec · Entrée ou Échap pour revenir 
+ ✔ done · Enter or Esc to go back 	 ✔ terminé · Entrée ou Échap pour revenir 
+ running · type here to answer prompts (sudo password) · Ctrl+C cancels 	 en cours · tapez ici pour répondre aux invites (mot de passe sudo) · Ctrl+C annule 
+tabs: Store · Search · Installed · Updates · Queue · Recipes · Settings	onglets : Boutique · Recherche · Installés · Mises à jour · File · Recettes · Réglages
+search (Esc or Enter leaves the input)	rechercher (Échap ou Entrée quitte le champ)
+move · PgUp/PgDn · g/G first/last	déplacer · PgPréc/PgSuiv · g/G premier/dernier
+Store: shelves / apps · elsewhere: scroll details	Boutique : rayons / apps · ailleurs : faire défiler les détails
+mark for install (or remove, if installed)	marquer à installer (ou à retirer, si installé)
+mark for removal · in the queue: drop the line	marquer à retirer · dans la file : retirer la ligne
+install the selected package right now	installer le paquet sélectionné tout de suite
+apply the queue	appliquer la file
+update everything (repos, then AUR)	tout mettre à jour (dépôts, puis AUR)
+details: Info · Dependencies · Files · PKGBUILD	détails : Infos · Dépendances · Fichiers · PKGBUILD
+Installed: filter · queue all orphans	Installés : filtre · mettre tous les orphelins en file
+reload the package databases	recharger les bases de paquets
+Settings: self-update, AUR helper, Flatpak, Snap, extra repositories	Réglages : mise à jour automatique, assistant AUR, Flatpak, Snap, dépôts supplémentaires
+While a command runs, keys go to it (sudo asks there). Ctrl+C cancels.	Pendant qu'une commande tourne, les touches lui sont envoyées (sudo demande là). Ctrl+C annule.
+{} packages known · config: {}	{} paquets connus · config : {}
+ Keys · any key closes 	 Touches · n'importe quelle touche ferme 
+Made by Chidaruma · github.com/Chidaruma696	Créé par Chidaruma · github.com/Chidaruma696
+No AppStream data: install archlinux-appstream-data for the store shelves.	Pas de données AppStream : installez archlinux-appstream-data pour les rayons de la boutique.
+{} in the queue	{} dans la file
+Nothing to do.	Rien à faire.
+Reading the package databases…	Lecture des bases de paquets…
+Package databases reloaded.	Bases de paquets rechargées.
+Sanae {} is out: Settings (7) → Update Sanae now	Sanae {} est sorti : Réglages (7) → Mettre à jour Sanae maintenant
+{} is already installed	{} est déjà installé
+No orphans (or not checked yet: press f until 'orphans').	Aucun orphelin (ou pas encore vérifié : appuyez sur f jusqu'à « orphelins »).
+{} orphans queued for removal	{} orphelins en file pour retrait
+The queue is empty: mark packages with space.	La file est vide : marquez des paquets avec espace.
+{} news items ask for attention; read them on the Updates tab	{} actualités demandent votre attention ; lisez-les dans l'onglet Mises à jour
+Settings saved.	Réglages enregistrés.
+could not save the settings: {}	impossible d'enregistrer les réglages : {}
+Installing {}	Installation de {}
+Applying the queue	Application de la file
+Updating the system	Mise à jour du système
+Recipe: {}	Recette : {}
+Updating Sanae	Mise à jour de Sanae

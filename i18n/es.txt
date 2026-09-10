@@ -144,7 +144,7 @@ Downloads the latest release binary and replaces this one (needs your password).
 The program that builds AUR packages for you: paru or yay. Auto picks whichever is installed.	El programa que compila los paquetes del AUR por ti: paru o yay. Auto elige el que esté instalado.
 How Sanae becomes root to run pacman: sudo or doas. Auto picks whichever is installed.	Cómo se hace root Sanae para ejecutar pacman: sudo o doas. Auto elige el que esté instalado.
 Use Nerd Font glyphs for the marks in lists. Only if your terminal font has them.	Usar glifos de Nerd Font para las marcas de las listas. Solo si la fuente de tu terminal los tiene.
-The language of this interface: English, Spanish, or whatever the system asks for.	El idioma de esta interfaz: inglés, español, o el que pida el sistema.
+The language of this interface. Auto follows the system language.	El idioma de esta interfaz. Auto sigue el idioma del sistema.
 \nAlready enabled.	\nYa activada.
 \nNot enabled. Enter enables it.	\nNo activada. Enter la activa.
 ⚠ Third-party repositories, the AUR, Flatpak and Snap are not reviewed by Arch Linux.	⚠ Los repositorios de terceros, el AUR, Flatpak y Snap no los revisa Arch Linux.
