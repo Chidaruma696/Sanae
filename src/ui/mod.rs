@@ -1058,20 +1058,24 @@ impl App {
             ExecEvent::Done(code) => {
                 run.partial.clear();
                 run.runner = None;
+                let mut next = false;
                 if code != 0 {
-                    run.lines.push_back(format!("✖ exited with {code}"));
+                    run.lines.push_back(format!("\u{2716} exited with {code}"));
                     run.failed = true;
                     run.finished = true;
                 } else if run.current + 1 < run.steps.len() {
                     run.current += 1;
-                    self.spawn_current_step();
+                    next = true;
                 } else {
-                    run.lines.push_back("✔ done".into());
+                    run.lines.push_back("\u{2714} done".into());
                     run.finished = true;
                 }
                 if run.finished {
                     let text: String = run.lines.iter().map(|l| format!("{l}\n")).collect();
                     let _ = std::fs::write(log_path, text);
+                }
+                if next {
+                    self.spawn_current_step();
                 }
             }
         }
