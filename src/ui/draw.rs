@@ -519,8 +519,8 @@ fn draw_recipes(f: &mut Frame, app: &App, area: Rect) {
         }
         match app.recipe_status.get(&r.id) {
             Some(true) => lines
-                .push(Line::from(Span::styled(t("\nAlready applied. Enter applies it again (safe)."), app.theme.ok()))),
-            Some(false) => lines.push(Line::from(Span::styled(t("\nNot applied yet."), app.theme.dim()))),
+                .push(Line::from(Span::styled(t("Already applied. Enter applies it again (safe)."), app.theme.ok()))),
+            Some(false) => lines.push(Line::from(Span::styled(t("Not applied yet."), app.theme.dim()))),
             None => {}
         }
     }
@@ -781,7 +781,10 @@ fn draw_keys(f: &mut Frame, app: &App, area: Rect) {
             ("q", t("quit")),
         ],
         Tab::Recipes => &[("↑↓", t("move")), ("Enter", t("apply recipe")), ("?", t("help")), ("q", t("quit"))],
-        Tab::Settings => &[("↑↓", t("move")), ("Enter", t("toggle / apply")), ("?", t("help")), ("q", t("quit"))],
+        Tab::Settings if app.sources_open => {
+            &[("Esc", t("back")), ("↑↓", t("move")), ("Enter", t("enable")), ("?", t("help")), ("q", t("quit"))]
+        }
+        Tab::Settings => &[("↑↓", t("move")), ("Enter", t("change / open")), ("?", t("help")), ("q", t("quit"))],
     };
     let mut spans = Vec::new();
     for (k, what) in keys {
@@ -799,31 +802,88 @@ fn draw_settings(f: &mut Frame, app: &App, area: Rect) {
     let rows = app.settings_rows();
     let sources = app.source_recipes();
     let mut items: Vec<ListItem> = Vec::new();
-    for (_, label, value) in &rows {
+    if app.sources_open {
+        for r in &sources {
+            let (mark, style) = match app.recipe_status.get(&r.id) {
+                Some(true) => (app.theme.installed(), app.theme.ok()),
+                Some(false) => ("○", app.theme.dim()),
+                None => ("…", app.theme.dim()),
+            };
+            let name = source_short(&r.id);
+            items.push(ListItem::new(Line::from(vec![
+                Span::styled(format!("{mark} "), style),
+                Span::raw(name.to_string()),
+            ])));
+        }
+    } else {
+        for (_, label, value) in &rows {
+            items.push(ListItem::new(Line::from(vec![
+                Span::raw(format!("{label:<26}")),
+                Span::styled(value.clone(), app.theme.accent()),
+            ])));
+        }
+        let on = sources.iter().filter(|r| app.recipe_status.get(&r.id) == Some(&true)).count();
+        let val = if on > 0 { tfmt!("{} enabled", on) } else { t("Flatpak · Chaotic-AUR · BlackArch…").into() };
         items.push(ListItem::new(Line::from(vec![
-            Span::raw(format!("{label:<34}")),
-            Span::styled(value.clone(), app.theme.accent()),
+            Span::raw(format!("{:<26}", t("Package sources ▸"))),
+            Span::styled(val, app.theme.dim()),
         ])));
     }
-    for r in &sources {
-        let (mark, style) = match app.recipe_status.get(&r.id) {
-            Some(true) => (app.theme.installed(), app.theme.ok()),
-            Some(false) => ("○", app.theme.dim()),
-            None => ("…", app.theme.dim()),
-        };
-        items.push(ListItem::new(Line::from(vec![Span::styled(format!("{mark} "), style), Span::raw(r.name.clone())])));
-    }
-    let title = Line::from(vec![
-        Span::styled(t(" Settings "), app.theme.title()),
-        Span::styled(t(" Enter toggles a setting or enables a source "), app.theme.dim()),
-    ]);
-    let list =
-        List::new(items).block(block(app, title, true)).highlight_style(app.theme.highlight()).highlight_symbol("▸ ");
+    let header = if app.sources_open {
+        t(" Package sources · Enter enables one · Esc back ")
+    } else {
+        t(" Enter changes a setting or opens the sources ")
+    };
+    let title =
+        Line::from(vec![Span::styled(t(" Settings "), app.theme.title()), Span::styled(header, app.theme.dim())]);
+    let list = List::new(items)
+        .block(block(app, title, true))
+        .highlight_style(app.theme.highlight())
+        .highlight_symbol("\u{25b8} ");
     let mut st = ListState::default().with_selected(Some(app.settings_sel));
     f.render_stateful_widget(list, cols[0], &mut st);
 
     let mut lines: Vec<Line> = Vec::new();
-    if app.settings_sel < rows.len() {
+    if app.sources_open {
+        if let Some(r) = sources.get(app.settings_sel) {
+            lines.push(Line::from(Span::styled(r.name.clone(), app.theme.title())));
+            lines.push(Line::from(""));
+            lines.push(Line::from(source_blurb(&r.id)));
+            lines.push(Line::from(""));
+            if !r.packages.is_empty() {
+                lines.push(Line::from(vec![
+                    Span::styled(t("packages   "), app.theme.accent()),
+                    Span::raw(r.packages.join(" ")),
+                ]));
+            }
+            if !r.aur.is_empty() {
+                lines.push(Line::from(vec![
+                    Span::styled(t("aur        "), app.theme.warn()),
+                    Span::raw(r.aur.join(" ")),
+                ]));
+            }
+            if let Some(n) = &r.notes {
+                lines.push(Line::from(""));
+                lines.push(Line::from(Span::styled(n.clone(), app.theme.dim())));
+            }
+            match app.recipe_status.get(&r.id) {
+                Some(true) => lines.push(Line::from(Span::styled(t("Already enabled."), app.theme.ok()))),
+                Some(false) => {
+                    lines.push(Line::from(Span::styled(t("Not enabled. Enter enables it."), app.theme.dim())))
+                }
+                None => {}
+            }
+        }
+        lines.push(Line::from(""));
+        lines.push(Line::from(Span::styled(
+            t("\u{26a0} These are not reviewed by Arch Linux. A package from them can break an update or ship anything."),
+            app.theme.warn(),
+        )));
+        lines.push(Line::from(Span::styled(
+            t("  Enable only what you understand, and read PKGBUILDs before building."),
+            app.theme.warn(),
+        )));
+    } else if app.settings_sel < rows.len() {
         let (id, label, _) = &rows[app.settings_sel];
         lines.push(Line::from(Span::styled(label.clone(), app.theme.title())));
         lines.push(Line::from(""));
@@ -843,41 +903,20 @@ fn draw_settings(f: &mut Frame, app: &App, area: Rect) {
             _ => "",
         };
         lines.push(Line::from(text));
-    } else if let Some(r) = sources.get(app.settings_sel - rows.len()) {
-        lines.push(Line::from(Span::styled(r.name.clone(), app.theme.title())));
-        lines.push(Line::from(r.summary.clone()));
+    } else {
+        lines.push(Line::from(Span::styled(t("Package sources"), app.theme.title())));
         lines.push(Line::from(""));
-        if !r.packages.is_empty() {
-            lines.push(Line::from(vec![
-                Span::styled(t("packages   "), app.theme.accent()),
-                Span::raw(r.packages.join(" ")),
-            ]));
-        }
-        if !r.aur.is_empty() {
-            lines.push(Line::from(vec![Span::styled(t("aur        "), app.theme.warn()), Span::raw(r.aur.join(" "))]));
-        }
-        if !r.commands.is_empty() {
-            lines.push(Line::from(vec![
-                Span::styled(t("commands   "), app.theme.accent()),
-                Span::raw(r.commands.iter().map(|c| c.run.clone()).collect::<Vec<_>>().join(" ; ")),
-            ]));
-        }
-        if let Some(n) = &r.notes {
-            lines.push(Line::from(""));
-            lines.push(Line::from(Span::styled(n.clone(), app.theme.warn())));
-        }
-        match app.recipe_status.get(&r.id) {
-            Some(true) => lines.push(Line::from(Span::styled(t("\nAlready enabled."), app.theme.ok()))),
-            Some(false) => lines.push(Line::from(Span::styled(t("\nNot enabled. Enter enables it."), app.theme.dim()))),
-            None => {}
-        }
+        lines.push(Line::from(t(
+            "Extra places to install software from, each off by default. Enter opens the list; every one explains what it is and what it is good for before you turn it on.",
+        )));
+        lines.push(Line::from(""));
+        lines.push(Line::from(vec![
+            Span::styled(t("Chaotic-AUR"), app.theme.ok()),
+            Span::raw(t(" is the handy one; ")),
+            Span::styled(t("BlackArch"), app.theme.warn()),
+            Span::raw(t(" is only for security work.")),
+        ]));
     }
-    lines.push(Line::from(""));
-    lines.push(Line::from(Span::styled(
-        t("⚠ Third-party repositories, the AUR, Flatpak and Snap are not reviewed by Arch Linux."),
-        app.theme.warn(),
-    )));
-    lines.push(Line::from(Span::styled(t("  A package from them can break an update or ship anything. Enable only what you understand, and read PKGBUILDs before building."), app.theme.warn())));
     lines.push(Line::from(""));
     lines.push(Line::from(Span::styled(
         t("Sanae and Reimu are made by Chidaruma. Do you like them? Visit github.com/Chidaruma696 and leave a star."),
@@ -889,6 +928,44 @@ fn draw_settings(f: &mut Frame, app: &App, area: Rect) {
         false,
     ));
     f.render_widget(p, cols[1]);
+}
+
+/// A short name for a source in the list.
+fn source_short(id: &str) -> &'static str {
+    match id {
+        "source-flatpak" => "Flatpak (Flathub)",
+        "source-snap" => "Snap",
+        "source-chaotic-aur" => "Chaotic-AUR",
+        "source-liquorix" => "Liquorix kernel",
+        "source-blackarch" => "BlackArch",
+        "source-alhp" => "ALHP (v3/v4)",
+        _ => "source",
+    }
+}
+
+/// A plain-words explanation of what a source is and what it is good for.
+fn source_blurb(id: &str) -> &'static str {
+    match id {
+        "source-chaotic-aur" => t(
+            "The one most people want. Thousands of AUR programs already compiled by its maintainers, so browsers, editors, games and drivers install in seconds instead of building for minutes. Widely used and handy; still a third party, so a package could break an update.",
+        ),
+        "source-flatpak" => t(
+            "Flatpak with Flathub: desktop apps that run sandboxed, apart from the system, and update on their own. Good for closed-source or GUI apps you want kept separate from pacman. Built by their publishers, not by Arch.",
+        ),
+        "source-snap" => t(
+            "Canonical's take on the same idea, from the AUR. On Arch it has fewer apps than Flatpak and is heavier; enable it only if a program you need ships as a snap and nothing else.",
+        ),
+        "source-liquorix" => t(
+            "A desktop-tuned kernel (linux-lqx) for smoother audio, gaming and video when the machine is busy. Nice on a workstation, but you must add it to your bootloader after installing. A third-party kernel.",
+        ),
+        "source-alhp" => t(
+            "Arch's own packages rebuilt for newer CPUs (x86-64-v3 or v4) for a small speed gain. Helps only on a 2015-or-later CPU and is safe to skip. Community project; its packages lag Arch by a few hours.",
+        ),
+        "source-blackarch" => t(
+            "Adds 2 800+ security and penetration-testing tools: scanners, exploits, forensics, wireless. It is meant for security work, the tools are dual-use, and the repository is large. If you are not sure you want it, you do not need it. Once enabled, the \u{2620} Darkside shelf in the Store lists these tools by group.",
+        ),
+        _ => "",
+    }
 }
 
 fn draw_run(f: &mut Frame, app: &App, area: Rect) {
@@ -952,7 +1029,12 @@ fn draw_help(f: &mut Frame, app: &App, area: Rect) {
         Line::from(vec![k("f / o"), Span::raw(t("Installed: filter · queue all orphans"))]),
         Line::from(vec![k("r"), Span::raw(t("reload the package databases"))]),
         Line::from(vec![k("q"), Span::raw(t("quit"))]),
-        Line::from(vec![k("7"), Span::raw(t("Settings: self-update, AUR helper, Flatpak, Snap, extra repositories"))]),
+        Line::from(vec![
+            k("7"),
+            Span::raw(t(
+                "Settings: preferences, and Package sources ▸ (Flatpak, Chaotic-AUR, BlackArch…) each explained",
+            )),
+        ]),
         Line::from(vec![
             k("☠ A"),
             Span::raw(t(

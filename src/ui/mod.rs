@@ -210,6 +210,8 @@ pub struct App {
     pub recipe_sel: usize,
     // Settings
     pub settings_sel: usize,
+    /// Settings: the package-sources submenu is open.
+    pub sources_open: bool,
     pub new_release: Option<String>,
     // Details
     pub detail_tab: DetailTab,
@@ -276,6 +278,7 @@ pub async fn run(cfg: Config, cache: Cache) -> Result<()> {
         recipe_status: HashMap::new(),
         recipe_sel: 0,
         settings_sel: 0,
+        sources_open: false,
         new_release: None,
         detail_tab: DetailTab::Info,
         details: HashMap::new(),
@@ -436,12 +439,37 @@ impl App {
     }
 
     fn settings_len(&self) -> usize {
-        self.settings_rows().len() + self.source_recipes().len()
+        if self.sources_open { self.source_recipes().len() } else { self.settings_rows().len() + 1 }
+    }
+
+    /// Row index of the "Package sources" opener on the Settings list.
+    pub fn sources_row(&self) -> usize {
+        self.settings_rows().len()
+    }
+
+    fn close_sources(&mut self) {
+        if self.sources_open {
+            self.sources_open = false;
+            self.settings_sel = self.sources_row();
+        }
     }
 
     /// Enter on a Settings row.
     fn settings_activate(&mut self) {
+        if self.sources_open {
+            let i = self.settings_sel;
+            if let Some(r) = self.source_recipes().get(i).map(|r| (*r).clone()) {
+                self.run_recipe(r);
+            }
+            return;
+        }
         let rows = self.settings_rows();
+        if self.settings_sel == rows.len() {
+            // The "Package sources" opener.
+            self.sources_open = true;
+            self.settings_sel = 0;
+            return;
+        }
         if self.settings_sel < rows.len() {
             match rows[self.settings_sel].0 {
                 "check_updates" => self.cfg.general.check_updates = !self.cfg.general.check_updates,
@@ -509,11 +537,7 @@ impl App {
                 Ok(()) => self.status = t("Settings saved.").into(),
                 Err(e) => self.status = tfmt!("could not save the settings: {}", e),
             }
-            return;
         }
-        let i = self.settings_sel - rows.len();
-        let Some(r) = self.source_recipes().get(i).map(|r| (*r).clone()) else { return };
-        self.run_recipe(r);
     }
 
     fn refresh_store(&mut self) {
@@ -1162,6 +1186,7 @@ impl App {
         }
         match k.code {
             KeyCode::Esc | KeyCode::Backspace if self.tab == Tab::Store && self.dark_open.is_some() => self.dark_back(),
+            KeyCode::Esc | KeyCode::Backspace if self.tab == Tab::Settings && self.sources_open => self.close_sources(),
             KeyCode::Char('q') | KeyCode::Esc => {
                 if self.tab == Tab::Search && !self.query.is_empty() && k.code == KeyCode::Esc {
                     self.query.clear();
@@ -1184,7 +1209,9 @@ impl App {
             KeyCode::End | KeyCode::Char('G') => self.move_sel(100_000),
             KeyCode::Tab => self.next_detail_tab(),
             KeyCode::Left | KeyCode::Char('h') => {
-                if self.tab == Tab::Store && !self.shelf_focus && self.dark_open.is_some() {
+                if self.tab == Tab::Settings && self.sources_open {
+                    self.close_sources();
+                } else if self.tab == Tab::Store && !self.shelf_focus && self.dark_open.is_some() {
                     self.dark_back();
                 } else if self.tab == Tab::Store {
                     self.shelf_focus = true;
@@ -1332,6 +1359,7 @@ impl App {
     }
 
     fn switch_tab(&mut self, tab: Tab) {
+        self.sources_open = false;
         self.tab = tab;
         self.typing = false;
         self.detail_scroll = 0;
