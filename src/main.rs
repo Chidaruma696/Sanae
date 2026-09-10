@@ -145,6 +145,9 @@ async fn main() -> Result<()> {
         Some(Cmd::Apply { recipes, chroot, user, dry_run }) => cmd_apply(&recipes, chroot, user, dry_run, &cfg),
         Some(Cmd::SelfUpdate) => {
             let dir = if cache.dir().as_os_str().is_empty() { std::env::temp_dir() } else { cache.dir().clone() };
+            if selfupdate::has_wget() {
+                return exec::run_inherit(&selfupdate::wget_steps(&cfg.privilege(), &dir, &selfupdate::target()));
+            }
             eprintln!("Downloading {}", selfupdate::BINARY);
             let file = selfupdate::download(&dir).await?;
             exec::run_inherit(&selfupdate::install_steps(&cfg.privilege(), &file, &selfupdate::target()))

@@ -54,3 +54,18 @@ jobs:
         run: |
           cp target/x86_64-unknown-linux-musl/release/sanae sanae-x86_64-linux
           gh release create "${GITHUB_REF_NAME}" sanae-x86_64-linux --title "Sanae ${GITHUB_REF_NAME}" --generate-notes
+      - name: Publish the binary on the bin branch
+        # Release assets live on githubusercontent.com, which some networks reset.
+        # github.com itself (archive downloads) and jsDelivr keep working there,
+        # so the same binary also goes to an orphan branch with a single commit.
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          rm -rf /tmp/bin && mkdir /tmp/bin
+          cp sanae-x86_64-linux /tmp/bin/
+          printf '%s\n' "${GITHUB_REF_NAME}" > /tmp/bin/VERSION
+          cd /tmp/bin
+          git init -q -b bin
+          git config user.name chidaruma696
+          git config user.email chidarumap696@gmail.com
+          git add . && git commit -qm "Sanae ${GITHUB_REF_NAME} binary"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" bin
