@@ -191,3 +191,6 @@ Applying the queue	Aplicando a fila
 Updating the system	Atualizando o sistema
 Recipe: {}	Receita: {}
 Updating Sanae	Atualizando o Sanae
+Downloading the latest Sanae…	Baixando o Sanae mais recente…
+update: {}	atualização: {}
+⬆ Sanae {} is out · 7 → Update Sanae now 	⬆ Saiu o Sanae {} · 7 → Atualizar o Sanae agora 

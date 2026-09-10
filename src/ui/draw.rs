@@ -658,6 +658,12 @@ fn draw_status(f: &mut Frame, app: &App, area: Rect) {
         Span::styled(t(" Made by Chidaruma · like it? star it at github.com/Chidaruma696"), app.theme.dim())
     };
     f.render_widget(Paragraph::new(Line::from(left)), area);
+    if let Some(tag) = &app.new_release {
+        let note = tfmt!("⬆ Sanae {} is out · 7 → Update Sanae now ", tag);
+        let w = (note.chars().count() as u16).min(area.width);
+        let right = Rect { x: area.x + area.width - w, width: w, ..area };
+        f.render_widget(Paragraph::new(Line::from(Span::styled(note, app.theme.warn()))), right);
+    }
 }
 
 /// The keys that matter on this tab, always visible.

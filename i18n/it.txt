@@ -191,3 +191,6 @@ Applying the queue	Applico la coda
 Updating the system	Aggiorno il sistema
 Recipe: {}	Ricetta: {}
 Updating Sanae	Aggiorno Sanae
+Downloading the latest Sanae…	Scarico l'ultimo Sanae…
+update: {}	aggiornamento: {}
+⬆ Sanae {} is out · 7 → Update Sanae now 	⬆ È uscito Sanae {} · 7 → Aggiorna Sanae adesso 

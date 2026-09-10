@@ -143,7 +143,12 @@ async fn main() -> Result<()> {
         }
         Some(Cmd::Recipes) => cmd_recipes(cli.json),
         Some(Cmd::Apply { recipes, chroot, user, dry_run }) => cmd_apply(&recipes, chroot, user, dry_run, &cfg),
-        Some(Cmd::SelfUpdate) => exec::run_inherit(&selfupdate::update_steps(&cfg.privilege())),
+        Some(Cmd::SelfUpdate) => {
+            let dir = if cache.dir().as_os_str().is_empty() { std::env::temp_dir() } else { cache.dir().clone() };
+            eprintln!("Downloading {}", selfupdate::BINARY);
+            let file = selfupdate::download(&dir).await?;
+            exec::run_inherit(&selfupdate::install_steps(&cfg.privilege(), &file, &selfupdate::target()))
+        }
         Some(Cmd::Clean) => {
             let n = cache.clear()?;
             println!("removed {n} cached files from {}", cache.dir().display());
