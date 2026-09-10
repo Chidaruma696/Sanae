@@ -1,0 +1,65 @@
+name = "Theme: Arc"
+summary = "Flat with transparency, the popular one · GTK theme with Papirus-Dark icons, applied to whatever desktop you run"
+category = "Look"
+packages = ["papirus-icon-theme"]
+aur = ["arc-gtk-theme"]
+check = "test -d /usr/share/themes/Arc-Dark && grep -qs 'gtk-theme-name=Arc-Dark' ~/.config/gtk-3.0/settings.ini"
+notes = "Works on XFCE, GNOME, KDE Plasma, Cinnamon, MATE, Budgie, LXQt, COSMIC and the window managers. Applied right away when run inside the desktop, otherwise at the next login. Change it any time in your desktop's appearance settings."
+
+[[commands]]
+as = "user"
+run = '''
+T='Arc-Dark'; I='Papirus-Dark'; DARK=1
+set -u
+# GTK 2, 3 and 4: every desktop and every GTK app reads these.
+mkdir -p "$HOME/.config/gtk-3.0" "$HOME/.config/gtk-4.0"
+printf 'gtk-theme-name="%s"\ngtk-icon-theme-name="%s"\n' "$T" "$I" > "$HOME/.gtkrc-2.0"
+for v in 3 4; do
+  printf '[Settings]\ngtk-theme-name=%s\ngtk-icon-theme-name=%s\ngtk-application-prefer-dark-theme=%s\n' "$T" "$I" "$DARK" > "$HOME/.config/gtk-$v/settings.ini"
+done
+# GTK 4 and libadwaita apps only follow a theme that is linked into ~/.config/gtk-4.0.
+for f in gtk.css gtk-dark.css assets; do
+  [ -L "$HOME/.config/gtk-4.0/$f" ] && rm -f "$HOME/.config/gtk-4.0/$f"
+  [ -e "/usr/share/themes/$T/gtk-4.0/$f" ] && ln -s "/usr/share/themes/$T/gtk-4.0/$f" "$HOME/.config/gtk-4.0/$f"
+done
+[ "$DARK" = 1 ] && SCHEME=prefer-dark || SCHEME=default
+has() { [ -e "/usr/share/themes/$T/$1" ]; }
+gs() { command -v gsettings >/dev/null 2>&1 && gsettings set "$@" 2>/dev/null; true; }
+ini() { # file section key value
+  local f="$1" s="$2" k="$3" v="$4"
+  mkdir -p "$(dirname "$f")"; [ -f "$f" ] || printf '[%s]\n' "$s" > "$f"
+  grep -q "^\[$s\]" "$f" || printf '\n[%s]\n' "$s" >> "$f"
+  if sed -n "/^\[$s\]/,/^\[/p" "$f" | grep -q "^$k="; then sed -i "/^\[$s\]/,/^\[/ s|^$k=.*|$k=$v|" "$f"
+  else sed -i "/^\[$s\]/a $k=$v" "$f"; fi
+}
+# The running desktop, applied live when a session is there and saved for the next login.
+case "${XDG_CURRENT_DESKTOP:-}" in
+  *XFCE*)
+    xfconf-query -c xsettings -p /Net/ThemeName -t string -s "$T" --create 2>/dev/null
+    xfconf-query -c xsettings -p /Net/IconThemeName -t string -s "$I" --create 2>/dev/null
+    has xfwm4 && xfconf-query -c xfwm4 -p /general/theme -t string -s "$T" --create 2>/dev/null ;;
+  *Cinnamon*)
+    gs org.cinnamon.desktop.interface gtk-theme "$T"; gs org.cinnamon.desktop.interface icon-theme "$I"
+    has metacity-1 && gs org.cinnamon.desktop.wm.preferences theme "$T"
+    has cinnamon && gs org.cinnamon.theme name "$T" ;;
+  *MATE*)
+    gs org.mate.interface gtk-theme "$T"; gs org.mate.interface icon-theme "$I"
+    has metacity-1 && gs org.mate.Marco.general theme "$T" ;;
+  *KDE*)
+    KW=kwriteconfig6; command -v $KW >/dev/null 2>&1 || KW=kwriteconfig5
+    $KW --file kdeglobals --group Icons --key Theme "$I" 2>/dev/null
+    if [ "$DARK" = 1 ]; then plasma-apply-colorscheme BreezeDark >/dev/null 2>&1; else plasma-apply-colorscheme BreezeLight >/dev/null 2>&1; fi
+    gdbus call --session --dest org.kde.GtkConfig --object-path /GtkConfig --method org.kde.GtkConfig.setGtkTheme "$T" >/dev/null 2>&1 ;;
+  *LXQt*)
+    ini "$HOME/.config/lxqt/lxqt.conf" General icon_theme "$I"
+    if [ "$DARK" = 1 ]; then ini "$HOME/.config/lxqt/lxqt.conf" General theme dark; else ini "$HOME/.config/lxqt/lxqt.conf" General theme light; fi ;;
+  *COSMIC*)
+    mkdir -p "$HOME/.config/cosmic/com.system76.CosmicTheme.Mode/v1"
+    if [ "$DARK" = 1 ]; then echo true; else echo false; fi > "$HOME/.config/cosmic/com.system76.CosmicTheme.Mode/v1/is_dark" ;;
+  *)
+    gs org.gnome.desktop.interface gtk-theme "$T"; gs org.gnome.desktop.interface icon-theme "$I"
+    gs org.gnome.desktop.interface color-scheme "$SCHEME"
+    has gnome-shell && gs org.gnome.shell.extensions.user-theme name "$T" ;;
+esac
+true
+'''

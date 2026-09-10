@@ -174,7 +174,7 @@ CI runs format, clippy, tests and builds a static `x86_64-unknown-linux-musl` bi
 - `sanae-bin` on the AUR.
 - More languages: add `i18n/<code>.txt` (one `English<TAB>Translation` per line) and register it in `i18n.rs`. The Japanese and Russian tables were written with care but not by native speakers: corrections are welcome.
 - Screenshots in the terminal for terminals that can show images.
-- More recipes, and recipes for GNOME and KDE themes.
+- More recipes.
 - Flatpak, if anyone asks.
 
 <br/>
