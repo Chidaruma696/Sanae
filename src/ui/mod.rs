@@ -33,10 +33,12 @@ pub enum Tab {
     Updates,
     Queue,
     Recipes,
+    Settings,
 }
 
 impl Tab {
-    pub const ALL: [Tab; 6] = [Tab::Store, Tab::Search, Tab::Installed, Tab::Updates, Tab::Queue, Tab::Recipes];
+    pub const ALL: [Tab; 7] =
+        [Tab::Store, Tab::Search, Tab::Installed, Tab::Updates, Tab::Queue, Tab::Recipes, Tab::Settings];
     pub fn title(self) -> &'static str {
         match self {
             Tab::Store => "Store",
@@ -45,6 +47,7 @@ impl Tab {
             Tab::Updates => "Updates",
             Tab::Queue => "Queue",
             Tab::Recipes => "Recipes",
+            Tab::Settings => "Settings",
         }
     }
     fn index(self) -> usize {
@@ -118,6 +121,7 @@ pub enum Msg {
     IndexReloaded(Index),
     Exec(ExecEvent),
     Error(String),
+    NewRelease(String),
 }
 
 /// A running sequence of commands, shown full screen.
@@ -170,6 +174,9 @@ pub struct App {
     pub recipes: Vec<Recipe>,
     pub recipe_status: HashMap<String, bool>,
     pub recipe_sel: usize,
+    // Settings
+    pub settings_sel: usize,
+    pub new_release: Option<String>,
     // Details
     pub detail_tab: DetailTab,
     pub details: HashMap<String, Details>,
@@ -232,6 +239,8 @@ pub async fn run(cfg: Config, cache: Cache) -> Result<()> {
         recipes: crate::recipes::load_all(),
         recipe_status: HashMap::new(),
         recipe_sel: 0,
+        settings_sel: 0,
+        new_release: None,
         detail_tab: DetailTab::Info,
         details: HashMap::new(),
         files: HashMap::new(),
@@ -257,6 +266,7 @@ pub async fn run(cfg: Config, cache: Cache) -> Result<()> {
     app.fetch_popularity();
     app.fetch_updates();
     app.check_recipes();
+    app.check_self_update();
 
     // Terminal events on a plain thread; everything else is async.
     let tx_keys = tx.clone();
@@ -321,6 +331,106 @@ fn load_index() -> Result<Index> {
 
 impl App {
     // ---------------------------------------------------------------- data
+
+    /// Recipes shown on the Recipes tab (software), in order.
+    pub fn software_recipes(&self) -> Vec<&Recipe> {
+        self.recipes.iter().filter(|r| r.category != crate::recipes::SOURCES_CATEGORY).collect()
+    }
+
+    /// Recipes shown on the Settings tab (package sources), in order.
+    pub fn source_recipes(&self) -> Vec<&Recipe> {
+        self.recipes.iter().filter(|r| r.category == crate::recipes::SOURCES_CATEGORY).collect()
+    }
+
+    /// Settings rows before the sources: id, label, value.
+    pub fn settings_rows(&self) -> Vec<(&'static str, String, String)> {
+        let helper = match self.cfg.general.aur_helper.as_str() {
+            "auto" | "" => format!("auto ({})", self.cfg.aur_helper().unwrap_or_else(|| "none found".into())),
+            h => h.to_string(),
+        };
+        vec![
+            (
+                "check_updates",
+                "Check for a newer Sanae at start".into(),
+                if self.cfg.general.check_updates { "on".into() } else { "off".into() },
+            ),
+            (
+                "self_update",
+                "Update Sanae now".into(),
+                match &self.new_release {
+                    Some(t) => format!("{t} available (you run v{})", env!("CARGO_PKG_VERSION")),
+                    None => format!("v{} · Enter fetches the latest release", env!("CARGO_PKG_VERSION")),
+                },
+            ),
+            ("aur_helper", "AUR helper".into(), helper),
+            (
+                "privilege",
+                "Administrator tool".into(),
+                format!("{} ({})", self.cfg.general.privilege, self.cfg.privilege()),
+            ),
+            ("nerd_font", "Nerd Font marks".into(), if self.cfg.theme.nerd_font { "on".into() } else { "off".into() }),
+        ]
+    }
+
+    fn check_self_update(&self) {
+        if !self.cfg.general.check_updates {
+            return;
+        }
+        let (http, cache, tx) = (self.http.clone(), self.cache.clone(), self.tx.clone());
+        tokio::spawn(async move {
+            if let Ok(tag) = crate::selfupdate::latest(&http, &cache).await
+                && crate::selfupdate::is_newer(&tag)
+            {
+                let _ = tx.send(Msg::NewRelease(tag));
+            }
+        });
+    }
+
+    fn settings_len(&self) -> usize {
+        self.settings_rows().len() + self.source_recipes().len()
+    }
+
+    /// Enter on a Settings row.
+    fn settings_activate(&mut self) {
+        let rows = self.settings_rows();
+        if self.settings_sel < rows.len() {
+            match rows[self.settings_sel].0 {
+                "check_updates" => self.cfg.general.check_updates = !self.cfg.general.check_updates,
+                "self_update" => {
+                    let steps = crate::selfupdate::update_steps(&self.cfg.privilege());
+                    self.start_run("Updating Sanae", steps);
+                    return;
+                }
+                "aur_helper" => {
+                    self.cfg.general.aur_helper = match self.cfg.general.aur_helper.as_str() {
+                        "auto" | "" => "paru".into(),
+                        "paru" => "yay".into(),
+                        _ => "auto".into(),
+                    }
+                }
+                "privilege" => {
+                    self.cfg.general.privilege = match self.cfg.general.privilege.as_str() {
+                        "auto" | "" => "sudo".into(),
+                        "sudo" => "doas".into(),
+                        _ => "auto".into(),
+                    }
+                }
+                "nerd_font" => {
+                    self.cfg.theme.nerd_font = !self.cfg.theme.nerd_font;
+                    self.theme = Theme::from_config(&self.cfg.theme);
+                }
+                _ => {}
+            }
+            match self.cfg.save() {
+                Ok(()) => self.status = "Settings saved.".into(),
+                Err(e) => self.status = format!("could not save the settings: {e}"),
+            }
+            return;
+        }
+        let i = self.settings_sel - rows.len();
+        let Some(r) = self.source_recipes().get(i).map(|r| (*r).clone()) else { return };
+        self.run_recipe(r);
+    }
 
     fn refresh_store(&mut self) {
         let shelf = self.shelf_name(self.shelf_sel);
@@ -554,7 +664,7 @@ impl App {
             Tab::Installed => self.inst_items.get(self.inst_sel).map(String::as_str),
             Tab::Updates => self.updates.as_ref().and_then(|u| u.get(self.upd_sel)).map(|u| u.name.as_str()),
             Tab::Queue => self.queue.items.get(self.queue_sel).map(|i| i.name.as_str()),
-            Tab::Recipes => None,
+            Tab::Recipes | Tab::Settings => None,
         }
     }
 
@@ -571,7 +681,8 @@ impl App {
             Tab::Installed => self.inst_items.len(),
             Tab::Updates => self.updates.as_ref().map_or(0, Vec::len),
             Tab::Queue => self.queue.len(),
-            Tab::Recipes => self.recipes.len(),
+            Tab::Recipes => self.software_recipes().len(),
+            Tab::Settings => self.settings_len(),
         }
     }
 
@@ -589,6 +700,7 @@ impl App {
             Tab::Updates => &mut self.upd_sel,
             Tab::Queue => &mut self.queue_sel,
             Tab::Recipes => &mut self.recipe_sel,
+            Tab::Settings => &mut self.settings_sel,
         }
     }
 
@@ -824,6 +936,10 @@ impl App {
             }
             Msg::Exec(ev) => self.on_exec(ev),
             Msg::Error(e) => self.status = e,
+            Msg::NewRelease(tag) => {
+                self.status = format!("Sanae {tag} is out: Settings (7) → Update Sanae now");
+                self.new_release = Some(tag);
+            }
         }
     }
 
@@ -855,7 +971,7 @@ impl App {
                 }
             }
             KeyCode::Char('?') => self.show_help = true,
-            KeyCode::Char(c @ '1'..='6') => self.switch_tab(Tab::ALL[(c as u8 - b'1') as usize]),
+            KeyCode::Char(c @ '1'..='7') => self.switch_tab(Tab::ALL[(c as u8 - b'1') as usize]),
             KeyCode::Char('/') => {
                 self.switch_tab(Tab::Search);
                 self.typing = true;
@@ -888,12 +1004,14 @@ impl App {
                     self.on_selection_changed();
                 }
                 Tab::Recipes => self.apply_recipe(),
+                Tab::Settings => self.settings_activate(),
                 Tab::Queue => self.apply_queue(),
                 Tab::Updates => self.update_all(),
                 _ => self.next_detail_tab(),
             },
             KeyCode::Char(' ') => match self.tab {
                 Tab::Recipes => self.apply_recipe(),
+                Tab::Settings => self.settings_activate(),
                 Tab::Updates => {}
                 _ => self.toggle_queue(Action::Install),
             },
@@ -1048,7 +1166,11 @@ impl App {
     }
 
     fn apply_recipe(&mut self) {
-        let Some(r) = self.recipes.get(self.recipe_sel).cloned() else { return };
+        let Some(r) = self.software_recipes().get(self.recipe_sel).map(|r| (*r).clone()) else { return };
+        self.run_recipe(r);
+    }
+
+    fn run_recipe(&mut self, r: Recipe) {
         let user = std::env::var("SUDO_USER").or_else(|_| std::env::var("USER")).unwrap_or_else(|_| "root".into());
         let opts =
             ApplyOptions { chroot: None, user, privilege: self.cfg.privilege(), aur_helper: self.cfg.aur_helper() };

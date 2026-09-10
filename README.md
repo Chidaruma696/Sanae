@@ -52,7 +52,7 @@ sanae
 [Reimu](https://github.com/Chidaruma696/Reimu) offers to do exactly this at the end of an installation.
 
 ```
- 早苗 Sanae   1 Store · 2 Search · 3 Installed · 4 Updates (7) · 5 Queue (2) · 6 Recipes            ? help  q quit
+ 早苗 Sanae   1 Store · 2 Search · 3 Installed · 4 Updates (7) · 5 Queue (2) · 6 Recipes · 7 Settings   ? help  q quit
 ╭ Shelves ───────────╮╭ Internet · 148 apps · by popularity ─────────────────────────────────────────────╮
 │ ★ Featured         ││ ✔ extra     Firefox  (firefox)                69.2%  Web Browser                  │
 │▸🌐 Internet        ││   extra     Chromium  (chromium)              31.0%  Web browser                  │
@@ -64,12 +64,13 @@ sanae
 │ source      extra        installed   143.0-1 · explicitly · 2026-08-30                                 │
 │ size        262.1 MiB installed, 70.0 MiB download      popularity  69.2% of Arch systems have it      │
 ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯
- ←→ shelves/apps · space mark · i install now · Enter open
+ Made by Chidaruma · like it? star it at github.com/Chidaruma696
+ ←→ shelves/apps  ↑↓ move  space mark  i install now  Enter open  Tab details  a apply queue  ? help  q quit
 ```
 
-**Tabs.** *Store*: shelves from AppStream (Internet, Multimedia, Graphics, Office, Development, Games, Education, System, Utilities) with human names, summaries and how many Arch systems have each app, plus *Featured*: the most installed apps you do not have. *Search*: repositories and the AUR in one list as you type. *Installed*: all, explicit, dependencies, orphans, or AUR/local, with one key to queue every orphan. *Updates*: repositories and AUR, with the Arch news above them. *Queue*: what you marked, what pacman would download and remove, the exact commands. *Recipes*: install and configure in one go.
+**Tabs.** *Store*: shelves from AppStream (Internet, Multimedia, Graphics, Office, Development, Games, Education, System, Utilities) with human names, summaries and how many Arch systems have each app, plus *Featured*: the most installed apps you do not have. *Search*: repositories and the AUR in one list as you type. *Installed*: all, explicit, dependencies, orphans, or AUR/local, with one key to queue every orphan. *Updates*: repositories and AUR, with the Arch news above them. *Queue*: what you marked, what pacman would download and remove, the exact commands. *Recipes*: install and configure in one go. *Settings*: check for a newer Sanae at start and update it in place, AUR helper, sudo/doas, Nerd Font marks, and the extra sources: Flatpak (Flathub), Snap, Chaotic-AUR, the Liquorix kernel repository, BlackArch and ALHP (x86-64-v3/v4 builds), each with what it does and a warning, because nothing outside the official repositories is reviewed by Arch.
 
-**Keys.** `1-6` tabs · `/` search · `space` mark · `d` mark for removal · `i` install now · `a` apply the queue · `u` update everything · `Tab` Info / Dependencies / Files / PKGBUILD · `?` everything else. Commands run inside Sanae in a pseudo-terminal: sudo asks for your password right there, the output streams live, Ctrl+C cancels.
+**Keys.** `1-7` tabs · `/` search · `space` mark · `d` mark for removal · `i` install now · `a` apply the queue · `u` update everything · `Tab` Info / Dependencies / Files / PKGBUILD · `?` everything else. Commands run inside Sanae in a pseudo-terminal: sudo asks for your password right there, the output streams live, Ctrl+C cancels.
 
 ### Command line
 
@@ -88,6 +89,8 @@ sanae update                    # pacman -Syu, then the AUR helper
 sanae recipes                   # the recipes and whether each is applied
 sanae apply docker fonts        # install and configure
 sanae apply --chroot /mnt --user jp qemu-kvm --dry-run   # inside a fresh installation, printing the commands
+sanae apply source-flatpak      # the sources from Settings are recipes too
+sanae self-update               # replace this binary with the latest release
 sanae clean                     # drop Sanae's cache (~/.cache/sanae)
 ```
 
@@ -95,7 +98,7 @@ Add `--json` to `search`, `info`, `installed`, `updates` and `recipes` for machi
 
 ### Recipes
 
-A recipe is a small TOML file: packages, AUR packages, services to enable, groups to join, files to write, lines for `/etc/environment`, commands, and a `check` that says whether it is already applied. Every step is safe to repeat. Sanae ships with: fonts, japanese, qemu-kvm, docker, virtualbox, gaming, development, office, multimedia, graphics, internet, utilities, printing, bluetooth, and XFCE themes (Arc, Greybird, Materia, Catppuccin). Drop your own in `~/.config/sanae/recipes/` or `/etc/sanae/recipes/`.
+A recipe is a small TOML file: packages, AUR packages, services to enable, groups to join, files to write, lines for `/etc/environment`, commands, and a `check` that says whether it is already applied. Every step is safe to repeat. Sanae ships with: fonts, japanese, qemu-kvm, docker, virtualbox, gaming, development, office, multimedia, graphics, internet, utilities, printing, bluetooth, XFCE themes (Arc, Greybird, Materia, Catppuccin), and the sources shown in Settings (source-flatpak, source-snap, source-chaotic-aur, source-liquorix, source-blackarch, source-alhp). Drop your own in `~/.config/sanae/recipes/` or `/etc/sanae/recipes/`.
 
 ```toml
 name = "Docker"
@@ -115,6 +118,7 @@ notes = "Log out and back in so the docker group applies."
 [general]
 aur_helper = "auto"   # paru · yay · auto
 privilege = "auto"    # sudo · doas · auto
+check_updates = true  # ask GitHub for a newer Sanae at start
 
 [theme]
 accent = "#5fd7a7"    # Moriya green
@@ -136,6 +140,7 @@ src/
 ├── queue.rs           the queue, its preflight (pacman --print) and the commands that apply it
 ├── exec.rs            runs commands in a pty, streams lines, forwards keystrokes (sudo)
 ├── recipes.rs         TOML recipes, built-in ones embedded, --chroot aware plans
+├── selfupdate.rs      newer release? and the steps that replace the binary
 ├── recipes/           the recipes shipped in the binary
 ├── sources/
 │   ├── pacman.rs      expac -S / -Q dumps, pacman -Ql / -Fl, -Qdt, -Qm, checkupdates, vercmp

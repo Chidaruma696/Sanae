@@ -93,7 +93,16 @@ const BUILTIN: &[(&str, &str)] = &[
     ("theme-xfce-greybird", include_str!("../recipes/theme-xfce-greybird.toml")),
     ("theme-xfce-materia", include_str!("../recipes/theme-xfce-materia.toml")),
     ("theme-xfce-catppuccin", include_str!("../recipes/theme-xfce-catppuccin.toml")),
+    ("source-flatpak", include_str!("../recipes/source-flatpak.toml")),
+    ("source-snap", include_str!("../recipes/source-snap.toml")),
+    ("source-chaotic-aur", include_str!("../recipes/source-chaotic-aur.toml")),
+    ("source-liquorix", include_str!("../recipes/source-liquorix.toml")),
+    ("source-blackarch", include_str!("../recipes/source-blackarch.toml")),
+    ("source-alhp", include_str!("../recipes/source-alhp.toml")),
 ];
+
+/// Recipes that add package sources (Settings tab), as opposed to software.
+pub const SOURCES_CATEGORY: &str = "Sources";
 
 /// Directories with extra or overriding recipes, in priority order (last wins).
 fn user_dirs() -> Vec<PathBuf> {

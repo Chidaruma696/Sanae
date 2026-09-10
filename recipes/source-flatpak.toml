@@ -1,0 +1,9 @@
+name = "Flatpak (Flathub)"
+summary = "Flatpak with the Flathub remote: sandboxed apps from flathub.org, next to pacman"
+category = "Sources"
+packages = ["flatpak"]
+check = "flatpak remotes 2>/dev/null | grep -q flathub"
+notes = "Flathub apps are built by their publishers, not by Arch. They update with: flatpak update"
+
+[[commands]]
+run = "flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo"

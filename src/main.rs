@@ -9,6 +9,7 @@ mod index_tests;
 mod model;
 mod queue;
 mod recipes;
+mod selfupdate;
 mod sources;
 mod ui;
 
@@ -98,6 +99,8 @@ enum Cmd {
         #[arg(long)]
         dry_run: bool,
     },
+    /// Replace this binary with the latest release.
+    SelfUpdate,
     /// Remove Sanae's cache.
     Clean,
 }
@@ -133,6 +136,7 @@ async fn main() -> Result<()> {
         }
         Some(Cmd::Recipes) => cmd_recipes(cli.json),
         Some(Cmd::Apply { recipes, chroot, user, dry_run }) => cmd_apply(&recipes, chroot, user, dry_run, &cfg),
+        Some(Cmd::SelfUpdate) => exec::run_inherit(&selfupdate::update_steps(&cfg.privilege())),
         Some(Cmd::Clean) => {
             let n = cache.clear()?;
             println!("removed {n} cached files from {}", cache.dir().display());
