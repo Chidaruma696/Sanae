@@ -22,7 +22,7 @@ pub struct General {
     pub confirm: bool,
     /// Look for a newer Sanae at start.
     pub check_updates: bool,
-    /// Interface language: en, es, or auto.
+    /// Interface language: a code from i18n::LANGS, or auto.
     pub language: String,
 }
 

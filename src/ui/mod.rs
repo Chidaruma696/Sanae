@@ -433,10 +433,12 @@ impl App {
                     self.theme = Theme::from_config(&self.cfg.theme);
                 }
                 "language" => {
-                    self.cfg.general.language = match self.cfg.general.language.as_str() {
-                        "auto" | "" => "en".into(),
-                        "en" => "es".into(),
-                        _ => "auto".into(),
+                    let langs = crate::i18n::LANGS;
+                    let cur = self.cfg.general.language.as_str();
+                    self.cfg.general.language = match langs.iter().position(|(c, _)| *c == cur) {
+                        None => langs[0].0.into(),
+                        Some(i) if i + 1 < langs.len() => langs[i + 1].0.into(),
+                        Some(_) => "auto".into(),
                     };
                     crate::i18n::set(&self.cfg.general.language);
                 }

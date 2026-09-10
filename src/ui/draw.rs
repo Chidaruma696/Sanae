@@ -770,7 +770,7 @@ fn draw_settings(f: &mut Frame, app: &App, area: Rect) {
             }
             "privilege" => t("How Sanae becomes root to run pacman: sudo or doas. Auto picks whichever is installed."),
             "nerd_font" => t("Use Nerd Font glyphs for the marks in lists. Only if your terminal font has them."),
-            "language" => t("The language of this interface: English, Spanish, or whatever the system asks for."),
+            "language" => t("The language of this interface. Auto follows the system language."),
             _ => "",
         };
         lines.push(Line::from(text));

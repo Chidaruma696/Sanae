@@ -1,0 +1,193 @@
+# Sanae · Русский. One `English<TAB>Русский` per line. Keys are the English strings in the code.
+Store	Магазин
+Search	Поиск
+Installed	Установлено
+Updates	Обновления
+Queue	Очередь
+Recipes	Рецепты
+Settings	Настройки
+Info	Инфо
+Dependencies	Зависимости
+Files	Файлы
+PKGBUILD	PKGBUILD
+all	все
+explicit	явные
+dependencies	зависимости
+orphans	сироты
+AUR / local	AUR / локальные
+? help  q quit	? справка  q выход
+Featured	Рекомендуемое
+Internet	Интернет
+Multimedia	Мультимедиа
+Graphics	Графика
+Office	Офис
+Development	Разработка
+Games	Игры
+Education	Образование
+System	Система
+Utilities	Утилиты
+Other	Другое
+ Shelves 	 Полки 
+most installed apps you do not have yet	самые популярные приложения, которых у вас ещё нет
+by popularity	по популярности
+ {} · {} apps 	 {} · {} прил. 
+No AppStream catalog found.\n\nInstall archlinux-appstream-data (sudo pacman -S archlinux-appstream-data) and press r.\nThe Search tab works without it.	Каталог AppStream не найден.\n\nУстановите archlinux-appstream-data (sudo pacman -S archlinux-appstream-data) и нажмите r.\nВкладка «Поиск» работает и без него.
+type · Enter or ↓ to the results	вводите · Enter или ↓ к результатам
+/ to type · Esc clears	/ — ввод · Esc — очистить
+  searching the AUR…	  поиск в AUR…
+ Search 	 Поиск 
+ {} results 	 {} результатов 
+ Installed · {} 	 Установлено · {} 
+ {} packages · f changes the filter · o queues the orphans 	 {} пакетов · f — сменить фильтр · o — сироты в очередь 
+ Arch news 	 Новости Arch 
+ read before updating 	 прочитайте перед обновлением 
+Checking for updates…	Проверка обновлений…
+ Updates 	 Обновления 
+Everything is up to date.	Всё обновлено.
+ {} updates 	 {} обновлений 
+ u or Enter updates everything 	 u или Enter — обновить всё 
+ Queue · {} 	 Очередь · {} 
+ a applies · d drops one · c clears 	 a — применить · d — убрать один · c — очистить 
+Mark packages with space anywhere; they show up here.	Отмечайте пакеты пробелом где угодно; они появятся здесь.
+Asking pacman what it would do…	Спрашиваю pacman, что он сделает…
+Install ({}), {} to download	Установить ({}), скачать {}
+Remove ({})	Удалить ({})
+ What will happen 	 Что произойдёт 
+ Recipes 	 Рецепты 
+ install and leave it configured · Enter applies 	 установить и настроить · Enter — применить 
+packages   	пакеты     
+aur        	aur        
+services   	службы     
+groups     	группы     
+files      	файлы      
+environment	окружение  
+commands   	команды    
+\nAlready applied. Enter applies it again (safe).	\nУже применён. Enter применит снова (безопасно).
+\nNot applied yet.	\nЕщё не применён.
+ What it does 	 Что делает 
+Nothing selected.	Ничего не выбрано.
+ Details 	 Подробности 
+ Tab switches 	 Tab — переключить 
+source	источник
+installed	установлен
+no	нет
+explicitly	явно
+as a dependency	как зависимость
+size	размер
+{} installed	{} установлено
+, {} download	, {} загрузка
+popularity	популярность
+{} · {} votes	{} · {} голосов
+{}% of Arch systems have it	{}% систем Arch используют его
+license	лицензия
+url	url
+maintainer	сопровождающий
+flagged	помечен
+OUT OF DATE since {}	УСТАРЕЛ с {}
+groups	группы
+categories	категории
+screenshots	снимки экрана
+built	собран
+ by {}	 ({})
+loading…	загрузка…
+depends on	зависит от
+optional	необязательные
+build needs	для сборки
+provides	предоставляет
+conflicts	конфликты
+required by	требуется для
+optional for	необязателен для
+no dependencies	без зависимостей
+green = installed	зелёный = установлен
+{} files	{} файлов
+(only AUR packages have a PKGBUILD to show)	(PKGBUILD есть только у пакетов AUR)
+(AUR packages list their files only once installed)	(пакеты AUR показывают файлы только после установки)
+ Made by Chidaruma · like it? star it at github.com/Chidaruma696	 Автор: Chidaruma · понравилось? звезда на github.com/Chidaruma696
+shelves/apps	полки/прил.
+move	перемещение
+mark	отметить
+install now	установить сейчас
+open	открыть
+details	подробности
+apply queue	применить очередь
+help	справка
+quit	выход
+type	ввод
+mark remove	отметить на удаление
+filter	фильтр
+queue orphans	сироты в очередь
+update everything	обновить всё
+reload	перечитать
+apply	применить
+drop line	убрать строку
+clear	очистить
+scroll	прокрутка
+apply recipe	применить рецепт
+toggle / apply	переключить / применить
+Check for a newer Sanae at start	Проверять новую версию Sanae при запуске
+Update Sanae now	Обновить Sanae сейчас
+AUR helper	AUR-помощник
+Administrator tool	Инструмент администратора
+Nerd Font marks	Значки Nerd Font
+Language	Язык
+on	вкл
+off	выкл
+{} available (you run v{})	доступна {} (у вас v{})
+v{} · Enter fetches the latest release	v{} · Enter — скачать последний выпуск
+auto ({})	авто ({})
+none found	не найден
+auto (from the environment)	авто (из окружения)
+ Settings 	 Настройки 
+ Enter toggles a setting or enables a source 	 Enter переключает настройку или включает источник 
+Once every few hours Sanae asks GitHub whether a newer release exists and tells you in the status line. Nothing is downloaded until you ask.	Раз в несколько часов Sanae спрашивает GitHub, есть ли новый выпуск, и сообщает в строке состояния. Ничего не скачивается, пока вы не попросите.
+Downloads the latest release binary and replaces this one (needs your password). Sanae is a single file, so this is the whole update.	Скачивает последний выпуск и заменяет текущий файл (нужен ваш пароль). Sanae — один файл, так что это и есть всё обновление.
+The program that builds AUR packages for you: paru or yay. Auto picks whichever is installed.	Программа, которая собирает пакеты AUR за вас: paru или yay. «Авто» выбирает установленную.
+How Sanae becomes root to run pacman: sudo or doas. Auto picks whichever is installed.	Как Sanae получает права root для запуска pacman: sudo или doas. «Авто» выбирает установленный.
+Use Nerd Font glyphs for the marks in lists. Only if your terminal font has them.	Использовать глифы Nerd Font для значков в списках. Только если они есть в шрифте терминала.
+The language of this interface. Auto follows the system language.	Язык этого интерфейса. «Авто» следует языку системы.
+\nAlready enabled.	\nУже включён.
+\nNot enabled. Enter enables it.	\nНе включён. Enter включит.
+⚠ Third-party repositories, the AUR, Flatpak and Snap are not reviewed by Arch Linux.	⚠ Сторонние репозитории, AUR, Flatpak и Snap не проверяются Arch Linux.
+  A package from them can break an update or ship anything. Enable only what you understand, and read PKGBUILDs before building.	  Пакет оттуда может сломать обновление или содержать что угодно. Включайте только то, что понимаете, и читайте PKGBUILD перед сборкой.
+Sanae and Reimu are made by Chidaruma. Do you like them? Visit github.com/Chidaruma696 and leave a star.	Sanae и Reimu созданы Chidaruma. Понравилось? Загляните на github.com/Chidaruma696 и поставьте звезду.
+ About 	 О программе 
+ step {}/{} 	 шаг {}/{} 
+ output 	 вывод 
+ ✖ failed · Enter or Esc to go back 	 ✖ ошибка · Enter или Esc — назад 
+ ✔ done · Enter or Esc to go back 	 ✔ готово · Enter или Esc — назад 
+ running · type here to answer prompts (sudo password) · Ctrl+C cancels 	 выполняется · вводите здесь ответы на запросы (пароль sudo) · Ctrl+C — отмена 
+tabs: Store · Search · Installed · Updates · Queue · Recipes · Settings	вкладки: Магазин · Поиск · Установлено · Обновления · Очередь · Рецепты · Настройки
+search (Esc or Enter leaves the input)	поиск (Esc или Enter выходит из поля ввода)
+move · PgUp/PgDn · g/G first/last	перемещение · PgUp/PgDn · g/G — первый/последний
+Store: shelves / apps · elsewhere: scroll details	Магазин: полки / приложения · в других местах: прокрутка подробностей
+mark for install (or remove, if installed)	отметить на установку (или удаление, если установлен)
+mark for removal · in the queue: drop the line	отметить на удаление · в очереди: убрать строку
+install the selected package right now	установить выбранный пакет прямо сейчас
+apply the queue	применить очередь
+update everything (repos, then AUR)	обновить всё (репозитории, затем AUR)
+details: Info · Dependencies · Files · PKGBUILD	подробности: Инфо · Зависимости · Файлы · PKGBUILD
+Installed: filter · queue all orphans	Установлено: фильтр · все сироты в очередь
+reload the package databases	перечитать базы пакетов
+Settings: self-update, AUR helper, Flatpak, Snap, extra repositories	Настройки: самообновление, AUR-помощник, Flatpak, Snap, дополнительные репозитории
+While a command runs, keys go to it (sudo asks there). Ctrl+C cancels.	Пока выполняется команда, клавиши идут ей (sudo спрашивает там). Ctrl+C — отмена.
+{} packages known · config: {}	известно пакетов: {} · конфигурация: {}
+ Keys · any key closes 	 Клавиши · любая клавиша закрывает 
+Made by Chidaruma · github.com/Chidaruma696	Автор: Chidaruma · github.com/Chidaruma696
+No AppStream data: install archlinux-appstream-data for the store shelves.	Нет данных AppStream: установите archlinux-appstream-data для полок магазина.
+{} in the queue	в очереди: {}
+Nothing to do.	Нечего делать.
+Reading the package databases…	Чтение баз пакетов…
+Package databases reloaded.	Базы пакетов перечитаны.
+Sanae {} is out: Settings (7) → Update Sanae now	Вышел Sanae {}: Настройки (7) → Обновить Sanae сейчас
+{} is already installed	{} уже установлен
+No orphans (or not checked yet: press f until 'orphans').	Сирот нет (или ещё не проверено: нажимайте f до «сироты»).
+{} orphans queued for removal	сирот в очереди на удаление: {}
+The queue is empty: mark packages with space.	Очередь пуста: отметьте пакеты пробелом.
+{} news items ask for attention; read them on the Updates tab	новостей требуют внимания: {}; прочитайте их на вкладке «Обновления»
+Settings saved.	Настройки сохранены.
+could not save the settings: {}	не удалось сохранить настройки: {}
+Installing {}	Установка {}
+Applying the queue	Применение очереди
+Updating the system	Обновление системы
+Recipe: {}	Рецепт: {}
+Updating Sanae	Обновление Sanae

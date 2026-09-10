@@ -1,0 +1,193 @@
+# Sanae · 日本語. One `English<TAB>日本語` per line. Keys are the English strings in the code.
+Store	ストア
+Search	検索
+Installed	インストール済み
+Updates	更新
+Queue	キュー
+Recipes	レシピ
+Settings	設定
+Info	情報
+Dependencies	依存関係
+Files	ファイル
+PKGBUILD	PKGBUILD
+all	すべて
+explicit	明示的
+dependencies	依存関係
+orphans	孤立
+AUR / local	AUR / ローカル
+? help  q quit	? ヘルプ  q 終了
+Featured	おすすめ
+Internet	インターネット
+Multimedia	マルチメディア
+Graphics	グラフィック
+Office	オフィス
+Development	開発
+Games	ゲーム
+Education	教育
+System	システム
+Utilities	ユーティリティ
+Other	その他
+ Shelves 	 棚 
+most installed apps you do not have yet	まだ入れていない人気アプリ
+by popularity	人気順
+ {} · {} apps 	 {} · {} 件 
+No AppStream catalog found.\n\nInstall archlinux-appstream-data (sudo pacman -S archlinux-appstream-data) and press r.\nThe Search tab works without it.	AppStream カタログが見つかりません。\n\narchlinux-appstream-data をインストールして（sudo pacman -S archlinux-appstream-data）r を押してください。\n検索タブはなくても使えます。
+type · Enter or ↓ to the results	入力 · Enter または ↓ で結果へ
+/ to type · Esc clears	/ で入力 · Esc でクリア
+  searching the AUR…	  AUR を検索中…
+ Search 	 検索 
+ {} results 	 {} 件 
+ Installed · {} 	 インストール済み · {} 
+ {} packages · f changes the filter · o queues the orphans 	 {} 個 · f でフィルター切替 · o で孤立パッケージをキューへ 
+ Arch news 	 Arch ニュース 
+ read before updating 	 更新前に読んでください 
+Checking for updates…	更新を確認中…
+ Updates 	 更新 
+Everything is up to date.	すべて最新です。
+ {} updates 	 {} 件の更新 
+ u or Enter updates everything 	 u または Enter ですべて更新 
+ Queue · {} 	 キュー · {} 
+ a applies · d drops one · c clears 	 a 適用 · d 一件削除 · c 全消去 
+Mark packages with space anywhere; they show up here.	どこでもスペースでパッケージをマークすると、ここに表示されます。
+Asking pacman what it would do…	pacman に処理内容を確認中…
+Install ({}), {} to download	インストール ({})、ダウンロード {}
+Remove ({})	削除 ({})
+ What will happen 	 実行される内容 
+ Recipes 	 レシピ 
+ install and leave it configured · Enter applies 	 インストールして設定まで済ませる · Enter で適用 
+packages   	パッケージ 
+aur        	aur        
+services   	サービス   
+groups     	グループ   
+files      	ファイル   
+environment	環境変数   
+commands   	コマンド   
+\nAlready applied. Enter applies it again (safe).	\n適用済み。Enter で再適用（安全）。
+\nNot applied yet.	\n未適用。
+ What it does 	 内容 
+Nothing selected.	何も選択されていません。
+ Details 	 詳細 
+ Tab switches 	 Tab で切替 
+source	ソース
+installed	インストール
+no	なし
+explicitly	明示的
+as a dependency	依存として
+size	サイズ
+{} installed	インストール後 {}
+, {} download	、ダウンロード {}
+popularity	人気
+{} · {} votes	{} · {} 票
+{}% of Arch systems have it	Arch システムの {}% が使用
+license	ライセンス
+url	URL
+maintainer	メンテナー
+flagged	フラグ
+OUT OF DATE since {}	{} から古いまま
+groups	グループ
+categories	カテゴリー
+screenshots	スクリーンショット
+built	ビルド
+ by {}	 {} による
+loading…	読み込み中…
+depends on	依存
+optional	任意
+build needs	ビルドに必要
+provides	提供
+conflicts	競合
+required by	必要としているもの
+optional for	任意で使うもの
+no dependencies	依存関係なし
+green = installed	緑 = インストール済み
+{} files	{} ファイル
+(only AUR packages have a PKGBUILD to show)	（PKGBUILD を表示できるのは AUR パッケージのみ）
+(AUR packages list their files only once installed)	（AUR パッケージのファイル一覧はインストール後に表示されます）
+ Made by Chidaruma · like it? star it at github.com/Chidaruma696	 作者: Chidaruma · 気に入ったら github.com/Chidaruma696 でスターを
+shelves/apps	棚/アプリ
+move	移動
+mark	マーク
+install now	今すぐインストール
+open	開く
+details	詳細
+apply queue	キューを適用
+help	ヘルプ
+quit	終了
+type	入力
+mark remove	削除をマーク
+filter	フィルター
+queue orphans	孤立をキューへ
+update everything	すべて更新
+reload	再読み込み
+apply	適用
+drop line	行を削除
+clear	全消去
+scroll	スクロール
+apply recipe	レシピを適用
+toggle / apply	切替 / 適用
+Check for a newer Sanae at start	起動時に Sanae の新版を確認
+Update Sanae now	今すぐ Sanae を更新
+AUR helper	AUR ヘルパー
+Administrator tool	管理者ツール
+Nerd Font marks	Nerd Font の記号
+Language	言語
+on	オン
+off	オフ
+{} available (you run v{})	{} が利用可能（現在 v{}）
+v{} · Enter fetches the latest release	v{} · Enter で最新版を取得
+auto ({})	自動 ({})
+none found	見つかりません
+auto (from the environment)	自動（環境から）
+ Settings 	 設定 
+ Enter toggles a setting or enables a source 	 Enter で設定を切り替え、またはソースを有効化 
+Once every few hours Sanae asks GitHub whether a newer release exists and tells you in the status line. Nothing is downloaded until you ask.	数時間ごとに Sanae は GitHub に新しいリリースがあるか確認し、ステータス行で知らせます。指示するまで何もダウンロードしません。
+Downloads the latest release binary and replaces this one (needs your password). Sanae is a single file, so this is the whole update.	最新リリースのバイナリをダウンロードして現在のものと置き換えます（パスワードが必要）。Sanae は一つのファイルなので、これで更新は完了です。
+The program that builds AUR packages for you: paru or yay. Auto picks whichever is installed.	AUR パッケージをビルドするプログラム: paru または yay。「自動」はインストール済みのものを使います。
+How Sanae becomes root to run pacman: sudo or doas. Auto picks whichever is installed.	pacman を実行するために Sanae が root になる方法: sudo または doas。「自動」はインストール済みのものを使います。
+Use Nerd Font glyphs for the marks in lists. Only if your terminal font has them.	一覧の記号に Nerd Font のグリフを使います。端末のフォントが対応している場合のみ。
+The language of this interface. Auto follows the system language.	この画面の言語。「自動」はシステムの言語に従います。
+\nAlready enabled.	\n有効化済み。
+\nNot enabled. Enter enables it.	\n未有効。Enter で有効化。
+⚠ Third-party repositories, the AUR, Flatpak and Snap are not reviewed by Arch Linux.	⚠ サードパーティのリポジトリ、AUR、Flatpak、Snap は Arch Linux の審査を受けていません。
+  A package from them can break an update or ship anything. Enable only what you understand, and read PKGBUILDs before building.	  そこからのパッケージは更新を壊したり、何が入っているかわからなかったりします。理解しているものだけを有効にし、ビルド前に PKGBUILD を読んでください。
+Sanae and Reimu are made by Chidaruma. Do you like them? Visit github.com/Chidaruma696 and leave a star.	Sanae と Reimu の作者は Chidaruma です。気に入ったら github.com/Chidaruma696 でスターをお願いします。
+ About 	 情報 
+ step {}/{} 	 手順 {}/{} 
+ output 	 出力 
+ ✖ failed · Enter or Esc to go back 	 ✖ 失敗 · Enter または Esc で戻る 
+ ✔ done · Enter or Esc to go back 	 ✔ 完了 · Enter または Esc で戻る 
+ running · type here to answer prompts (sudo password) · Ctrl+C cancels 	 実行中 · ここに入力して応答（sudo のパスワード）· Ctrl+C で中止 
+tabs: Store · Search · Installed · Updates · Queue · Recipes · Settings	タブ: ストア · 検索 · インストール済み · 更新 · キュー · レシピ · 設定
+search (Esc or Enter leaves the input)	検索（Esc または Enter で入力欄を抜ける）
+move · PgUp/PgDn · g/G first/last	移動 · PgUp/PgDn · g/G 先頭/末尾
+Store: shelves / apps · elsewhere: scroll details	ストア: 棚 / アプリ · その他: 詳細をスクロール
+mark for install (or remove, if installed)	インストールをマーク（インストール済みなら削除）
+mark for removal · in the queue: drop the line	削除をマーク · キュー内: 行を削除
+install the selected package right now	選択したパッケージを今すぐインストール
+apply the queue	キューを適用
+update everything (repos, then AUR)	すべて更新（リポジトリ、次に AUR）
+details: Info · Dependencies · Files · PKGBUILD	詳細: 情報 · 依存関係 · ファイル · PKGBUILD
+Installed: filter · queue all orphans	インストール済み: フィルター · 孤立をすべてキューへ
+reload the package databases	パッケージデータベースを再読み込み
+Settings: self-update, AUR helper, Flatpak, Snap, extra repositories	設定: 自己更新、AUR ヘルパー、Flatpak、Snap、追加リポジトリ
+While a command runs, keys go to it (sudo asks there). Ctrl+C cancels.	コマンド実行中はキー入力がそのコマンドに送られます（sudo はそこで尋ねます）。Ctrl+C で中止。
+{} packages known · config: {}	既知のパッケージ {} 個 · 設定: {}
+ Keys · any key closes 	 キー操作 · 何かキーを押すと閉じる 
+Made by Chidaruma · github.com/Chidaruma696	作者: Chidaruma · github.com/Chidaruma696
+No AppStream data: install archlinux-appstream-data for the store shelves.	AppStream データがありません。ストアの棚には archlinux-appstream-data をインストールしてください。
+{} in the queue	キューに {} 件
+Nothing to do.	何もすることはありません。
+Reading the package databases…	パッケージデータベースを読み込み中…
+Package databases reloaded.	パッケージデータベースを再読み込みしました。
+Sanae {} is out: Settings (7) → Update Sanae now	Sanae {} が公開されました: 設定 (7) → 今すぐ Sanae を更新
+{} is already installed	{} はインストール済みです
+No orphans (or not checked yet: press f until 'orphans').	孤立パッケージはありません（未確認の場合は「孤立」になるまで f を押してください）。
+{} orphans queued for removal	孤立パッケージ {} 個を削除キューに追加
+The queue is empty: mark packages with space.	キューは空です。スペースでパッケージをマークしてください。
+{} news items ask for attention; read them on the Updates tab	{} 件のニュースに注意が必要です。更新タブで読んでください
+Settings saved.	設定を保存しました。
+could not save the settings: {}	設定を保存できませんでした: {}
+Installing {}	{} をインストール中
+Applying the queue	キューを適用中
+Updating the system	システムを更新中
+Recipe: {}	レシピ: {}
+Updating Sanae	Sanae を更新中
