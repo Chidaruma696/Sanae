@@ -123,6 +123,7 @@ pub enum Msg {
     Exec(ExecEvent),
     Error(String),
     NewRelease(String),
+    UpdateReady(std::path::PathBuf),
 }
 
 /// A running sequence of commands, shown full screen.
@@ -410,8 +411,26 @@ impl App {
             match rows[self.settings_sel].0 {
                 "check_updates" => self.cfg.general.check_updates = !self.cfg.general.check_updates,
                 "self_update" => {
-                    let steps = crate::selfupdate::update_steps(&self.cfg.privilege());
-                    self.start_run(t("Updating Sanae"), steps);
+                    if self.busy.is_some() {
+                        return;
+                    }
+                    self.busy = Some(t("Downloading the latest Sanae…").into());
+                    let dir = if self.cache.dir().as_os_str().is_empty() {
+                        std::env::temp_dir()
+                    } else {
+                        self.cache.dir().clone()
+                    };
+                    let tx = self.tx.clone();
+                    tokio::spawn(async move {
+                        match crate::selfupdate::download(&dir).await {
+                            Ok(p) => {
+                                let _ = tx.send(Msg::UpdateReady(p));
+                            }
+                            Err(e) => {
+                                let _ = tx.send(Msg::Error(tfmt!("update: {}", format!("{e:#}"))));
+                            }
+                        }
+                    });
                     return;
                 }
                 "aur_helper" => {
@@ -958,7 +977,16 @@ impl App {
                 self.status = t("Package databases reloaded.").into();
             }
             Msg::Exec(ev) => self.on_exec(ev),
-            Msg::Error(e) => self.status = e,
+            Msg::Error(e) => {
+                self.busy = None;
+                self.status = e;
+            }
+            Msg::UpdateReady(path) => {
+                self.busy = None;
+                let steps =
+                    crate::selfupdate::install_steps(&self.cfg.privilege(), &path, &crate::selfupdate::target());
+                self.start_run(t("Updating Sanae"), steps);
+            }
             Msg::NewRelease(tag) => {
                 self.status = tfmt!("Sanae {} is out: Settings (7) → Update Sanae now", tag);
                 self.new_release = Some(tag);

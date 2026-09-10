@@ -191,3 +191,6 @@ Applying the queue	Wende die Warteschlange an
 Updating the system	Aktualisiere das System
 Recipe: {}	Rezept: {}
 Updating Sanae	Aktualisiere Sanae
+Downloading the latest Sanae…	Lade das neueste Sanae herunter…
+update: {}	Update: {}
+⬆ Sanae {} is out · 7 → Update Sanae now 	⬆ Sanae {} ist da · 7 → Sanae jetzt aktualisieren 

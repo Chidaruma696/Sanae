@@ -191,3 +191,6 @@ Applying the queue	キューを適用中
 Updating the system	システムを更新中
 Recipe: {}	レシピ: {}
 Updating Sanae	Sanae を更新中
+Downloading the latest Sanae…	最新の Sanae をダウンロード中…
+update: {}	更新: {}
+⬆ Sanae {} is out · 7 → Update Sanae now 	⬆ Sanae {} が公開 · 7 → 今すぐ Sanae を更新 

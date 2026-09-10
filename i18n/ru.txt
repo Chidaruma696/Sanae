@@ -191,3 +191,6 @@ Applying the queue	Применение очереди
 Updating the system	Обновление системы
 Recipe: {}	Рецепт: {}
 Updating Sanae	Обновление Sanae
+Downloading the latest Sanae…	Загрузка последней версии Sanae…
+update: {}	обновление: {}
+⬆ Sanae {} is out · 7 → Update Sanae now 	⬆ Вышел Sanae {} · 7 → Обновить Sanae сейчас 

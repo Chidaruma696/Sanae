@@ -191,3 +191,6 @@ Applying the queue	Application de la file
 Updating the system	Mise à jour du système
 Recipe: {}	Recette : {}
 Updating Sanae	Mise à jour de Sanae
+Downloading the latest Sanae…	Téléchargement du dernier Sanae…
+update: {}	mise à jour : {}
+⬆ Sanae {} is out · 7 → Update Sanae now 	⬆ Sanae {} est sorti · 7 → Mettre à jour Sanae maintenant 
