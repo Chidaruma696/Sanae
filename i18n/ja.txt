@@ -151,9 +151,9 @@ Sanae and Reimu are made by Chidaruma. Do you like them? Visit github.com/Chidar
  About 	 情報 
  step {}/{} 	 手順 {}/{} 
  output 	 出力 
- ✖ failed · Enter or Esc to go back 	 ✖ 失敗 · Enter または Esc で戻る 
- ✔ done · Enter or Esc to go back 	 ✔ 完了 · Enter または Esc で戻る 
- running · type here to answer prompts (sudo password) · Ctrl+C cancels 	 実行中 · ここに入力して応答（sudo のパスワード）· Ctrl+C で中止 
+ ✖ failed · Enter or Esc to go back · ↑↓ scroll	 ✖ 失敗 · Enter または Esc で戻る · ↑↓ でスクロール
+ ✔ done · Enter or Esc to go back · ↑↓ scroll	 ✔ 完了 · Enter または Esc で戻る · ↑↓ でスクロール
+ running · type here to answer prompts (sudo password) · PgUp/PgDn scroll · Ctrl+C cancels 	 実行中 · ここに入力して応答（sudo のパスワード）· PgUp/PgDn でスクロール · Ctrl+C で中止 
 tabs: Store · Search · Installed · Updates · Queue · Recipes · Settings	タブ: ストア · 検索 · インストール済み · 更新 · キュー · レシピ · 設定 · Darkside
 search (Esc or Enter leaves the input)	検索（Esc または Enter で入力欄を抜ける）
 move · PgUp/PgDn · g/G first/last	移動 · PgUp/PgDn · g/G 先頭/末尾
@@ -220,3 +220,6 @@ Canonical's take on the same idea, from the AUR. On Arch it has fewer apps than 
 A desktop-tuned kernel (linux-lqx) for smoother audio, gaming and video when the machine is busy. Nice on a workstation, but you must add it to your bootloader after installing. A third-party kernel.	デスクトップ向けに調整されたカーネル（linux-lqx）。負荷が高いときの音声、ゲーム、動画を滑らかにします。ワークステーションに向きますが、インストール後にブートローダーへ追加が必要です。第三者製カーネルです。
 Arch's own packages rebuilt for newer CPUs (x86-64-v3 or v4) for a small speed gain. Helps only on a 2015-or-later CPU and is safe to skip. Community project; its packages lag Arch by a few hours.	Arch 自身のパッケージを新しい CPU（x86-64-v3 または v4）向けに再ビルドし、わずかに高速化します。2015 年以降の CPU でしか効果がなく、飛ばしても問題ありません。コミュニティ企画で、パッケージは Arch より数時間遅れます。
 Adds 2 800+ security and penetration-testing tools: scanners, exploits, forensics, wireless. It is meant for security work, the tools are dual-use, and the repository is large. If you are not sure you want it, you do not need it. Once enabled, the ☠ Darkside shelf in the Store lists these tools by group.	セキュリティとペネトレーションテストのツールを 2,800 以上追加します：スキャナー、エクスプロイト、フォレンジック、無線。セキュリティ作業向けで、ツールはデュアルユース、リポジトリは巨大です。欲しいか自信がないなら必要ありません。有効にするとストアの ☠ Darkside 棚にこれらのツールがグループ別に並びます。
+ ↑ {} more · PgUp/PgDn scroll 	 ↑ あと {} 行 · PgUp/PgDn でスクロール 
+ · full log: {}	 · 完全なログ: {}
+ ✔ updated · Enter restarts Sanae with the new version · Esc keeps this one 	 ✔ 更新完了 · Enter で新しいバージョンの Sanae を再起動 · Esc でこのまま続行 

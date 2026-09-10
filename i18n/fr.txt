@@ -151,9 +151,9 @@ Sanae and Reimu are made by Chidaruma. Do you like them? Visit github.com/Chidar
  About 	 À propos 
  step {}/{} 	 étape {}/{} 
  output 	 sortie 
- ✖ failed · Enter or Esc to go back 	 ✖ échec · Entrée ou Échap pour revenir 
- ✔ done · Enter or Esc to go back 	 ✔ terminé · Entrée ou Échap pour revenir 
- running · type here to answer prompts (sudo password) · Ctrl+C cancels 	 en cours · tapez ici pour répondre aux invites (mot de passe sudo) · Ctrl+C annule 
+ ✖ failed · Enter or Esc to go back · ↑↓ scroll	 ✖ échec · Entrée ou Échap pour revenir · ↑↓ défiler
+ ✔ done · Enter or Esc to go back · ↑↓ scroll	 ✔ terminé · Entrée ou Échap pour revenir · ↑↓ défiler
+ running · type here to answer prompts (sudo password) · PgUp/PgDn scroll · Ctrl+C cancels 	 en cours · tapez ici pour répondre aux invites (mot de passe sudo) · PgPréc/PgSuiv défiler · Ctrl+C annule 
 tabs: Store · Search · Installed · Updates · Queue · Recipes · Settings	onglets : Boutique · Recherche · Installés · Mises à jour · File · Recettes · Réglages · Darkside
 search (Esc or Enter leaves the input)	rechercher (Échap ou Entrée quitte le champ)
 move · PgUp/PgDn · g/G first/last	déplacer · PgPréc/PgSuiv · g/G premier/dernier
@@ -220,3 +220,6 @@ Canonical's take on the same idea, from the AUR. On Arch it has fewer apps than 
 A desktop-tuned kernel (linux-lqx) for smoother audio, gaming and video when the machine is busy. Nice on a workstation, but you must add it to your bootloader after installing. A third-party kernel.	Un noyau réglé pour le bureau (linux-lqx), pour un audio, un jeu et une vidéo plus fluides quand la machine est chargée. Bien sur une station de travail, mais après l'installation il faut l'ajouter au chargeur d'amorçage. Un noyau tiers.
 Arch's own packages rebuilt for newer CPUs (x86-64-v3 or v4) for a small speed gain. Helps only on a 2015-or-later CPU and is safe to skip. Community project; its packages lag Arch by a few hours.	Les paquets d'Arch eux-mêmes recompilés pour les CPU récents (x86-64-v3 ou v4) pour un petit gain de vitesse. N'aide que sur un CPU de 2015 ou plus récent et peut être ignoré sans risque. Projet communautaire ; ses paquets ont quelques heures de retard sur Arch.
 Adds 2 800+ security and penetration-testing tools: scanners, exploits, forensics, wireless. It is meant for security work, the tools are dual-use, and the repository is large. If you are not sure you want it, you do not need it. Once enabled, the ☠ Darkside shelf in the Store lists these tools by group.	Ajoute plus de 2 800 outils de sécurité et de test d'intrusion : scanners, exploits, forensique, sans-fil. C'est pour le travail de sécurité, les outils sont à double usage et le dépôt est énorme. Si vous n'êtes pas sûr de le vouloir, vous n'en avez pas besoin. Une fois activé, le rayon ☠ Darkside de la Boutique liste ces outils par groupe.
+ ↑ {} more · PgUp/PgDn scroll 	 ↑ {} de plus · PgPréc/PgSuiv défiler 
+ · full log: {}	 · journal complet : {}
+ ✔ updated · Enter restarts Sanae with the new version · Esc keeps this one 	 ✔ mis à jour · Entrée relance Sanae avec la nouvelle version · Échap garde celle-ci 
