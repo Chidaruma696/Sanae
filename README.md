@@ -9,7 +9,6 @@
 
 ![Arch Linux](https://img.shields.io/badge/arch%20linux-pacman%20%2B%20AUR-1793d1?style=for-the-badge&logo=archlinux&logoColor=white)
 ![Rust](https://img.shields.io/badge/rust-2024-b7410e?style=for-the-badge&logo=rust&logoColor=white)
-![Runtime](https://img.shields.io/badge/runtime-pacman%20%2B%20expac-2b2140?style=for-the-badge&logo=gnubash&logoColor=white)
 ![License MIT](https://img.shields.io/badge/license-MIT-1b150d?style=for-the-badge)
 
 <br/>
