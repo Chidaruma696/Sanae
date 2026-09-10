@@ -35,13 +35,11 @@ pub enum Tab {
     Queue,
     Recipes,
     Settings,
-    /// BlackArch tools by group; shown once the BlackArch repository is enabled.
-    Darkside,
 }
 
 impl Tab {
-    pub const ALL: [Tab; 8] =
-        [Tab::Store, Tab::Search, Tab::Installed, Tab::Updates, Tab::Queue, Tab::Recipes, Tab::Settings, Tab::Darkside];
+    pub const ALL: [Tab; 7] =
+        [Tab::Store, Tab::Search, Tab::Installed, Tab::Updates, Tab::Queue, Tab::Recipes, Tab::Settings];
     pub fn title(self) -> &'static str {
         match self {
             Tab::Store => t("Store"),
@@ -51,13 +49,16 @@ impl Tab {
             Tab::Queue => t("Queue"),
             Tab::Recipes => t("Recipes"),
             Tab::Settings => t("Settings"),
-            Tab::Darkside => t("Darkside"),
         }
+    }
+    pub fn index(self) -> usize {
+        Tab::ALL.iter().position(|t| *t == self).unwrap_or(0)
     }
 }
 
-/// The synthetic Darkside group with defensive and detection tools (blue and
-/// red together, what Kali calls Purple), from any repository.
+/// Darkside: BlackArch tools by pacman group, as extra Store shelves once the
+/// repository is enabled. This synthetic group gathers defensive and detection
+/// tools (blue and red together, what Kali calls Purple) from any repository.
 pub const PURPLE_GROUP: &str = "purple team";
 const PURPLE_TOOLS: &[&str] = &[
     "suricata",
@@ -184,12 +185,9 @@ pub struct App {
     pub shelf_focus: bool,
     pub store_items: Vec<String>,
     pub store_sel: usize,
-    /// Darkside: BlackArch groups (name without the prefix, tool count).
+    /// Darkside: BlackArch groups (name without the prefix, tool count), shown
+    /// as Store shelves after the regular ones.
     pub dark_groups: Vec<(String, usize)>,
-    pub dark_group_sel: usize,
-    pub dark_focus: bool,
-    pub dark_items: Vec<String>,
-    pub dark_sel: usize,
     // Installed
     pub inst_filter: InstalledFilter,
     pub inst_items: Vec<String>,
@@ -260,10 +258,6 @@ pub async fn run(cfg: Config, cache: Cache) -> Result<()> {
         store_items: Vec::new(),
         store_sel: 0,
         dark_groups: Vec::new(),
-        dark_group_sel: 0,
-        dark_focus: true,
-        dark_items: Vec::new(),
-        dark_sel: 0,
         inst_filter: InstalledFilter::Explicit,
         inst_items: Vec::new(),
         inst_sel: 0,
@@ -458,6 +452,13 @@ impl App {
                     } else {
                         self.cache.dir().clone()
                     };
+                    if crate::selfupdate::has_wget() {
+                        self.busy = None;
+                        let steps =
+                            crate::selfupdate::wget_steps(&self.cfg.privilege(), &dir, &crate::selfupdate::target());
+                        self.start_run(t("Updating Sanae"), steps);
+                        return;
+                    }
                     let tx = self.tx.clone();
                     tokio::spawn(async move {
                         match crate::selfupdate::download(&dir).await {
@@ -513,6 +514,13 @@ impl App {
     }
 
     fn refresh_store(&mut self) {
+        if let Some(d) = self.dark_shelf() {
+            self.store_items = self.dark_tools(d);
+            if self.store_sel >= self.store_items.len() {
+                self.store_sel = 0;
+            }
+            return;
+        }
         let shelf = self.shelf_name(self.shelf_sel);
         let mut items: Vec<(&AppInfo, f64)> = self
             .apps
@@ -532,16 +540,6 @@ impl App {
         if self.store_sel >= self.store_items.len() {
             self.store_sel = 0;
         }
-    }
-
-    /// BlackArch's repository is enabled (its packages are in the index).
-    pub fn blackarch_enabled(&self) -> bool {
-        !self.dark_groups.is_empty()
-    }
-
-    /// The tabs in the bar: Darkside only once BlackArch is enabled.
-    pub fn tabs(&self) -> Vec<Tab> {
-        Tab::ALL.iter().copied().filter(|t| *t != Tab::Darkside || self.blackarch_enabled()).collect()
     }
 
     /// Rebuild the Darkside groups from the index (after a load or reload).
@@ -564,21 +562,20 @@ impl App {
             groups.insert(0, (PURPLE_GROUP.into(), purple));
         }
         self.dark_groups = groups;
-        if self.dark_group_sel >= self.dark_groups.len() {
-            self.dark_group_sel = 0;
+        if self.shelf_sel >= self.shelf_count() {
+            self.shelf_sel = 0;
         }
-        if self.tab == Tab::Darkside && !self.blackarch_enabled() {
-            self.tab = Tab::Store;
-        }
-        self.refresh_darkside();
+        self.refresh_store();
     }
 
-    /// The tools of the selected Darkside group, most installed first.
-    fn refresh_darkside(&mut self) {
-        let Some((group, _)) = self.dark_groups.get(self.dark_group_sel) else {
-            self.dark_items.clear();
-            return;
-        };
+    /// The Darkside group behind the selected shelf, if it is one.
+    pub fn dark_shelf(&self) -> Option<usize> {
+        self.shelf_sel.checked_sub(SHELVES.len() + 1).filter(|d| *d < self.dark_groups.len())
+    }
+
+    /// The tools of a Darkside group, most installed first.
+    fn dark_tools(&self, d: usize) -> Vec<String> {
+        let Some((group, _)) = self.dark_groups.get(d) else { return Vec::new() };
         let mut items: Vec<(&Package, f64)> = if group == PURPLE_GROUP {
             PURPLE_TOOLS.iter().filter_map(|n| self.index.get(n)).collect::<Vec<_>>()
         } else {
@@ -591,16 +588,16 @@ impl App {
         items.sort_by(|a, b| {
             b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal).then_with(|| a.0.name.cmp(&b.0.name))
         });
-        self.dark_items = items.into_iter().map(|(p, _)| p.name.clone()).collect();
-        if self.dark_sel >= self.dark_items.len() {
-            self.dark_sel = 0;
-        }
+        items.into_iter().map(|(p, _)| p.name.clone()).collect()
     }
 
-    /// Queue every tool of the selected Darkside group that is not installed yet.
+    /// Queue every tool of the selected Darkside shelf that is not installed yet.
     fn queue_dark_group(&mut self) {
+        if self.dark_shelf().is_none() {
+            return;
+        }
         let names: Vec<String> = self
-            .dark_items
+            .store_items
             .iter()
             .filter(|n| self.index.get(n).is_some_and(|p| !p.is_installed()) && self.queue.get(n).is_none())
             .cloned()
@@ -613,12 +610,24 @@ impl App {
         self.status = tfmt!("{} tools queued", names.len());
     }
 
+    /// The shelf's name; every Darkside shelf answers "Darkside" (see `dark_group_at`).
     pub fn shelf_name(&self, i: usize) -> &'static str {
-        if i == 0 { "Featured" } else { SHELVES.get(i - 1).map(|s| s.0).unwrap_or("Other") }
+        if i == 0 {
+            "Featured"
+        } else if i <= SHELVES.len() {
+            SHELVES[i - 1].0
+        } else {
+            "Darkside"
+        }
+    }
+
+    /// The BlackArch group (name, tool count) behind shelf `i`, if it is a Darkside one.
+    pub fn dark_group_at(&self, i: usize) -> Option<&(String, usize)> {
+        i.checked_sub(SHELVES.len() + 1).and_then(|d| self.dark_groups.get(d))
     }
 
     pub fn shelf_count(&self) -> usize {
-        SHELVES.len() + 1
+        SHELVES.len() + 1 + self.dark_groups.len()
     }
 
     fn refresh_installed(&mut self) {
@@ -823,7 +832,6 @@ impl App {
             Tab::Installed => self.inst_items.get(self.inst_sel).map(String::as_str),
             Tab::Updates => self.updates.as_ref().and_then(|u| u.get(self.upd_sel)).map(|u| u.name.as_str()),
             Tab::Queue => self.queue.items.get(self.queue_sel).map(|i| i.name.as_str()),
-            Tab::Darkside => self.dark_items.get(self.dark_sel).map(String::as_str),
             Tab::Recipes | Tab::Settings => None,
         }
     }
@@ -843,13 +851,6 @@ impl App {
             Tab::Queue => self.queue.len(),
             Tab::Recipes => self.software_recipes().len(),
             Tab::Settings => self.settings_len(),
-            Tab::Darkside => {
-                if self.dark_focus {
-                    self.dark_groups.len()
-                } else {
-                    self.dark_items.len()
-                }
-            }
         }
     }
 
@@ -868,13 +869,6 @@ impl App {
             Tab::Queue => &mut self.queue_sel,
             Tab::Recipes => &mut self.recipe_sel,
             Tab::Settings => &mut self.settings_sel,
-            Tab::Darkside => {
-                if self.dark_focus {
-                    &mut self.dark_group_sel
-                } else {
-                    &mut self.dark_sel
-                }
-            }
         }
     }
 
@@ -889,9 +883,6 @@ impl App {
         self.detail_scroll = 0;
         if self.tab == Tab::Store && self.shelf_focus {
             self.refresh_store();
-        }
-        if self.tab == Tab::Darkside && self.dark_focus {
-            self.refresh_darkside();
         }
         self.on_selection_changed();
     }
@@ -1158,11 +1149,7 @@ impl App {
                 }
             }
             KeyCode::Char('?') => self.show_help = true,
-            KeyCode::Char(c @ '1'..='8') => {
-                if let Some(tab) = self.tabs().get((c as u8 - b'1') as usize).copied() {
-                    self.switch_tab(tab);
-                }
-            }
+            KeyCode::Char(c @ '1'..='7') => self.switch_tab(Tab::ALL[(c as u8 - b'1') as usize]),
             KeyCode::Char('/') => {
                 self.switch_tab(Tab::Search);
                 self.typing = true;
@@ -1177,8 +1164,6 @@ impl App {
             KeyCode::Left | KeyCode::Char('h') => {
                 if self.tab == Tab::Store {
                     self.shelf_focus = true;
-                } else if self.tab == Tab::Darkside {
-                    self.dark_focus = true;
                 } else {
                     self.detail_scroll = self.detail_scroll.saturating_sub(5);
                 }
@@ -1187,9 +1172,6 @@ impl App {
                 if self.tab == Tab::Store {
                     self.shelf_focus = false;
                     self.on_selection_changed();
-                } else if self.tab == Tab::Darkside {
-                    self.dark_focus = false;
-                    self.on_selection_changed();
                 } else {
                     self.detail_scroll = self.detail_scroll.saturating_add(5);
                 }
@@ -1197,10 +1179,6 @@ impl App {
             KeyCode::Enter => match self.tab {
                 Tab::Store if self.shelf_focus => {
                     self.shelf_focus = false;
-                    self.on_selection_changed();
-                }
-                Tab::Darkside if self.dark_focus => {
-                    self.dark_focus = false;
                     self.on_selection_changed();
                 }
                 Tab::Recipes => self.apply_recipe(),
@@ -1242,7 +1220,7 @@ impl App {
                     }
                 }
             }
-            KeyCode::Char('A') if self.tab == Tab::Darkside => self.queue_dark_group(),
+            KeyCode::Char('A') if self.tab == Tab::Store => self.queue_dark_group(),
             KeyCode::Char('a') => self.apply_queue(),
             KeyCode::Char('u') => self.update_all(),
             KeyCode::Char('c') if self.tab == Tab::Queue => {

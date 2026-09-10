@@ -156,7 +156,7 @@ Sanae and Reimu are made by Chidaruma. Do you like them? Visit github.com/Chidar
  ✖ failed · Enter or Esc to go back 	 ✖ falló · Enter o Esc para volver 
  ✔ done · Enter or Esc to go back 	 ✔ hecho · Enter o Esc para volver 
  running · type here to answer prompts (sudo password) · Ctrl+C cancels 	 en marcha · escribe aquí para responder (contraseña de sudo) · Ctrl+C cancela 
-tabs: Store · Search · Installed · Updates · Queue · Recipes · Settings · Darkside	pestañas: Tienda · Buscar · Instalados · Actualizaciones · Cola · Recetas · Ajustes · Darkside
+tabs: Store · Search · Installed · Updates · Queue · Recipes · Settings	pestañas: Tienda · Buscar · Instalados · Actualizaciones · Cola · Recetas · Ajustes · Darkside
 search (Esc or Enter leaves the input)	buscar (Esc o Enter salen del campo)
 move · PgUp/PgDn · g/G first/last	mover · RePág/AvPág · g/G primero/último
 Store: shelves / apps · elsewhere: scroll details	Tienda: estantes / apps · en el resto: desplazar detalles
@@ -194,13 +194,10 @@ Updating Sanae	Actualizando Sanae
 Downloading the latest Sanae…	Descargando el último Sanae…
 update: {}	actualización: {}
 ⬆ Sanae {} is out · 7 → Update Sanae now 	⬆ Salió Sanae {} · 7 → Actualizar Sanae ahora 
- Groups 	 Grupos 
- {} · {} tools 	 {} · {} herramientas 
-groups/tools	grupos/herramientas
 queue the group	encolar el grupo
 {} tools queued	{} herramientas en la cola
 Purple team	Equipo púrpura
 detection, forensics and hardening · from any repository	detección, forense y endurecimiento · de cualquier repositorio
 by popularity · A queues the whole group	por popularidad · A encola el grupo entero
-No BlackArch tools found. Press r to reload the databases.	No hay herramientas de BlackArch. Pulsa r para recargar las bases de datos.
-Darkside: BlackArch tools by group · appears once the BlackArch repository is enabled	Darkside: herramientas de BlackArch por grupo · aparece al activar el repositorio BlackArch
+ ☠ Darkside · {} · {} tools 	 ☠ Darkside · {} · {} herramientas 
+Darkside: with the BlackArch repository enabled, its tools by group as Store shelves · A queues a whole group	Darkside: con el repositorio BlackArch activo, sus herramientas por grupo como estantes de la Tienda · A encola un grupo entero
