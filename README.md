@@ -15,6 +15,8 @@
 
 *One static binary · never links libalpm · repos and AUR in one list · recipes that leave things configured · eight interface languages*
 
+*Under active development; the interface changes between versions.*
+
 </div>
 
 ---
